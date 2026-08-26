@@ -1,0 +1,2359 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Leafnote — Book Review & Reading Studio</title>
+  <style>
+    :root {
+      --ink: #162022;
+      --muted: #5e6d6b;
+      --muted-light: #849491;
+      --paper: #fffdf9;
+      --paper-card: #ffffff;
+      --lime: #d8ee75;
+      --lime2: #b9d849;
+      --coral: #ff7758;
+      --lav: #e8e2ff;
+      --lav-dark: #4b3d75;
+      --line: #e3e6de;
+      --deep: #123d39;
+      --deep-light: #1b4f4a;
+      --green-sync: #10b981;
+      --amber-sync: #f59e0b;
+      --shadow-sm: 0 2px 8px rgba(18, 61, 57, 0.04);
+      --shadow-md: 0 8px 24px rgba(18, 61, 57, 0.07);
+      --shadow-lg: 0 16px 40px rgba(18, 61, 57, 0.12);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: #f7f7f1;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    button, input, textarea, select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ============================================================
+       App Shell & Header
+       ============================================================ */
+    .app {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px 24px 60px;
+      flex: 1;
+    }
+
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-weight: 800;
+      font-size: 24px;
+      letter-spacing: -0.8px;
+      color: var(--deep);
+      text-decoration: none;
+    }
+
+    .mark {
+      height: 38px;
+      width: 38px;
+      border-radius: 12px;
+      background: var(--lime);
+      display: grid;
+      place-items: center;
+      font-size: 21px;
+      transform: rotate(-6deg);
+      box-shadow: 0 3px 10px rgba(185, 216, 73, 0.3);
+    }
+
+    .sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: #eef2e6;
+      color: #385049;
+      letter-spacing: 0.2px;
+    }
+
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-sync);
+      box-shadow: 0 0 6px var(--green-sync);
+      animation: pulse 2s infinite;
+    }
+
+    .sync-status.offline .sync-dot {
+      background: var(--amber-sync);
+      box-shadow: none;
+      animation: none;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-outline, .btn-dark, .btn-soft, .btn-accent {
+      padding: 9px 15px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-outline {
+      border: 1px solid #d2d7cd;
+      background: var(--paper-card);
+      color: var(--ink);
+    }
+    .btn-outline:hover { background: #eef1ea; }
+
+    .btn-dark {
+      color: #fff;
+      background: var(--deep);
+    }
+    .btn-dark:hover { background: var(--deep-light); transform: translateY(-1px); }
+
+    .btn-soft {
+      background: #edf1e4;
+      color: var(--deep);
+    }
+    .btn-soft:hover { background: #e2e8d6; }
+
+    .btn-accent {
+      background: var(--lime2);
+      color: #172b0b;
+    }
+    .btn-accent:hover { background: #acd03b; }
+
+    /* ============================================================
+       Navigation Tabs (One-Click Switching)
+       ============================================================ */
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--paper-card);
+      padding: 6px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      margin-bottom: 22px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      box-shadow: var(--shadow-sm);
+    }
+    .nav-bar::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      background: transparent;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .tab-btn:hover {
+      color: var(--ink);
+      background: #f4f6ef;
+    }
+    .tab-btn.active {
+      background: var(--deep);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(18, 61, 57, 0.15);
+    }
+    .tab-badge {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: #e1e7db;
+      color: var(--deep);
+    }
+    .tab-btn.active .tab-badge {
+      background: var(--lime);
+      color: var(--deep);
+      font-weight: 800;
+    }
+
+    /* ============================================================
+       Hero Banner
+       ============================================================ */
+    .hero {
+      border-radius: var(--radius-lg);
+      background: var(--deep);
+      color: #fff;
+      padding: 28px 36px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow-md);
+    }
+    .hero:after {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      border: 32px solid var(--lime);
+      border-radius: 50%;
+      right: 25px;
+      top: -110px;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+    .hero h1 {
+      font-size: 28px;
+      letter-spacing: -1.2px;
+      margin: 0 0 6px;
+      max-width: 620px;
+      font-weight: 800;
+    }
+    .hero p {
+      margin: 0;
+      color: #d6e4df;
+      font-size: 15px;
+      max-width: 580px;
+    }
+
+    /* ============================================================
+       View Containers
+       ============================================================ */
+    .view-panel {
+      display: none;
+      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .view-panel.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(6px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--paper-card);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-sm);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    /* ============================================================
+       1. Writing View (Plain & Structured Mode)
+       ============================================================ */
+    .writer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .writer-modes {
+      display: flex;
+      background: #eef2e7;
+      padding: 4px;
+      border-radius: var(--radius-md);
+      gap: 4px;
+    }
+    .mode-btn {
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      background: transparent;
+    }
+    .mode-btn.active {
+      background: #ffffff;
+      color: var(--deep);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .fields-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 14px;
+    }
+    .full-width { grid-column: 1 / -1; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid #dfe3da;
+      background: #ffffff;
+      color: var(--ink);
+      font-size: 14.5px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #9ab834;
+      box-shadow: 0 0 0 3px rgba(216, 238, 117, 0.45);
+    }
+
+    textarea.review-textarea {
+      min-height: 160px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+    textarea.plain-textarea {
+      min-height: 240px;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .rating-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .stars { display: flex; gap: 4px; }
+    .star {
+      background: none;
+      color: #d1d8cf;
+      padding: 0;
+      font-size: 26px;
+      line-height: 1;
+    }
+    .star.on { color: #f59e0b; }
+    .rating-label { font-size: 13px; font-weight: 600; color: var(--muted); }
+
+    /* Meet the Cast / Characters Section */
+    .characters-section {
+      background: #fbfcf9;
+      border: 1px dashed #d5ded2;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-top: 6px;
+    }
+    .char-entry {
+      background: #ffffff;
+      border: 1px solid #e1e6db;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 10px;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+    .char-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .char-notes {
+      min-height: 52px;
+      resize: vertical;
+    }
+    .remove-char-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: transparent;
+      color: #94a39b;
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1;
+      padding: 4px 6px;
+      border-radius: 6px;
+    }
+    .remove-char-btn:hover {
+      color: var(--coral);
+      background: #ffefea;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* ============================================================
+       2. Shelf View (Library)
+       ============================================================ */
+    .shelf-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .search-input {
+      max-width: 320px;
+      padding: 9px 14px;
+      border-radius: 20px;
+      font-size: 13.5px;
+    }
+
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .review-card {
+      background: var(--paper-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .review-card:hover {
+      border-color: #b9d849;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .review-top {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .book-cover {
+      width: 44px;
+      height: 56px;
+      border-radius: 8px;
+      background: linear-gradient(145deg, #e7b8af, #ff7758);
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-family: Georgia, serif;
+      font-size: 22px;
+      flex: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    .review-card:nth-child(3n) .book-cover { background: linear-gradient(145deg, #9ebadd, #405b86); }
+    .review-card:nth-child(3n+2) .book-cover { background: linear-gradient(145deg, #cfc077, #77631f); }
+
+    .review-meta { flex: 1; min-width: 0; }
+    .review-title {
+      font-weight: 800;
+      font-size: 16.5px;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    .review-author {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .card-stars { color: #f59e0b; font-size: 13px; }
+
+    .review-snippet {
+      font-size: 13.5px;
+      color: #384643;
+      line-height: 1.5;
+      margin-bottom: 14px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .character-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .char-chip {
+      font-size: 11px;
+      font-weight: 700;
+      background: #edf2e8;
+      color: var(--deep);
+      padding: 3px 8px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #edf1ea;
+      padding-top: 12px;
+      font-size: 12px;
+      color: var(--muted-light);
+    }
+    .card-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* ============================================================
+       3. Share Studio & Instagram Post Canvas
+       ============================================================ */
+    .studio-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .theme-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .theme-chip {
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid #d2d8ce;
+      background: var(--paper-card);
+      cursor: pointer;
+    }
+    .theme-chip.active {
+      background: var(--deep);
+      color: #ffffff;
+      border-color: var(--deep);
+    }
+
+    /* Instagram Live Preview Card */
+    .insta-card-preview {
+      aspect-ratio: 1 / 1;
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      transition: all 0.3s ease;
+    }
+    .insta-card-preview.theme-emerald {
+      background: #123d39;
+    }
+    .insta-card-preview.theme-emerald:after {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: #d8ee75;
+      right: -50px;
+      top: -50px;
+      opacity: 0.95;
+      pointer-events: none;
+    }
+    .insta-card-preview.theme-parchment {
+      background: #fbf8ef;
+      color: #1a1a18;
+      border: 1px solid #dcd7c5;
+    }
+    .insta-card-preview.theme-parchment:after {
+      content: "❧";
+      position: absolute;
+      right: 20px;
+      top: 10px;
+      font-size: 140px;
+      color: #e5ded0;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .insta-card-preview.theme-midnight {
+      background: #0d171d;
+      color: #f1f5f9;
+    }
+    .insta-card-preview.theme-midnight:after {
+      content: "";
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #c084fc, #ff7758);
+      right: -30px;
+      top: -30px;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .prev-badge {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.85;
+      position: relative;
+      z-index: 2;
+    }
+    .prev-book {
+      font-family: Georgia, serif;
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 10px 0 4px;
+      position: relative;
+      z-index: 2;
+      max-width: 80%;
+    }
+    .prev-auth {
+      font-size: 14px;
+      opacity: 0.85;
+      position: relative;
+      z-index: 2;
+    }
+    .prev-quote {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 15px;
+      line-height: 1.5;
+      margin: 16px 0;
+      position: relative;
+      z-index: 2;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .prev-cast-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-top: 10px;
+      position: relative;
+      z-index: 2;
+    }
+    .theme-parchment .prev-cast-box {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .prev-cast-title {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      opacity: 0.75;
+    }
+    .prev-cast-items {
+      font-size: 12px;
+      line-height: 1.4;
+      max-height: 56px;
+      overflow: hidden;
+    }
+    .prev-stars {
+      color: #f59e0b;
+      font-size: 20px;
+      position: relative;
+      z-index: 2;
+      margin-top: auto;
+    }
+
+    /* ============================================================
+       4. Want to Read / Wishlist View
+       ============================================================ */
+    .wishlist-add-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    /* ============================================================
+       5. Export & Backup View
+       ============================================================ */
+    .export-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .export-card {
+      background: #fbfcf9;
+      border: 1px solid #dfe5da;
+      border-radius: var(--radius-md);
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .export-card:hover {
+      background: #f1f6eb;
+      border-color: #b9d849;
+    }
+    .export-card h3 {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+    .export-card p {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ============================================================
+       PIN Lock Screen Styling
+       ============================================================ */
+    .lock-screen {
+      position: fixed;
+      inset: 0;
+      background: #0e2420f2;
+      backdrop-filter: blur(18px);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .lock-screen.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .lock-card {
+      background: var(--paper-card);
+      max-width: 360px;
+      width: 100%;
+      border-radius: var(--radius-xl);
+      padding: 32px 26px 24px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+      text-align: center;
+      animation: cardPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes cardPop {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .lock-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--lav);
+      color: var(--lav-dark);
+      font-size: 24px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 14px;
+    }
+    .lock-title {
+      font-size: 22px;
+      margin: 0 0 4px;
+      font-weight: 800;
+      color: var(--deep);
+    }
+    .lock-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0 0 20px;
+    }
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .pin-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid #b8c4b8;
+      background: transparent;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .pin-dot.filled {
+      background: var(--deep);
+      border-color: var(--deep);
+      transform: scale(1.15);
+    }
+    .pin-dots.shake {
+      animation: shake 0.4s ease-in-out;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-12px); }
+      40%, 80% { transform: translateX(12px); }
+    }
+    .pin-error {
+      min-height: 18px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #dc2626;
+      margin-bottom: 10px;
+    }
+    .pin-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 270px;
+      margin: 0 auto 18px;
+    }
+    .key-btn {
+      height: 54px;
+      border-radius: 14px;
+      background: #f1f4ed;
+      color: var(--ink);
+      font-size: 20px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+    .key-btn:hover { background: #e3e8dc; }
+    .key-btn:active { background: #d5dccb; }
+    .key-action { font-size: 14px; color: #6a7873; background: transparent; }
+    .key-action:hover { background: #edf2e8; }
+    .pin-hint {
+      font-size: 12px;
+      color: #798a84;
+      background: #edf2e8;
+      padding: 5px 12px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+
+    /* Modal & Notice */
+    .notice {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translate(-50%, 100px);
+      background: #192c29;
+      color: white;
+      padding: 11px 18px;
+      border-radius: 10px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+      font-size: 14px;
+      font-weight: 600;
+      pointer-events: none;
+    }
+    .notice.show { transform: translate(-50%, 0); }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 34, 28, 0.6);
+      display: none;
+      place-items: center;
+      padding: 20px;
+      z-index: 500;
+      backdrop-filter: blur(4px);
+    }
+    .modal.show { display: grid; }
+    .modalbox {
+      max-width: 580px;
+      width: 100%;
+      max-height: 85vh;
+      overflow: auto;
+      background: var(--paper-card);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+    }
+    .modalbox h2 { font-size: 20px; margin-bottom: 8px; color: var(--deep); }
+    .modalbox p { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 12px; }
+
+    /* ============================================================
+       Responsive Layout Adaptation (Mobile, Tablet, Desktop)
+       ============================================================ */
+    @media (max-width: 900px) {
+      .app { padding: 14px 16px 50px; }
+      .fields-grid { grid-template-columns: 1fr; }
+      .studio-grid { grid-template-columns: 1fr; }
+      .hero { padding: 22px 24px; }
+      .hero h1 { font-size: 24px; }
+      .hero:after { right: -90px; top: -90px; width: 190px; height: 190px; }
+      .export-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .top-header { flex-direction: column; align-items: stretch; gap: 12px; }
+      .header-actions { justify-content: space-between; }
+      .nav-bar { padding: 4px; gap: 4px; }
+      .tab-btn { padding: 8px 12px; font-size: 13px; }
+      .card { padding: 16px; border-radius: var(--radius-md); }
+      .char-row { grid-template-columns: 1fr; }
+      .wishlist-add-box { flex-direction: column; }
+      .form-actions { flex-direction: column; }
+      .form-actions button { width: 100%; }
+      .reviews-grid { grid-template-columns: 1fr; }
+      .insta-card-preview { padding: 22px; }
+      .prev-book { font-size: 21px; max-width: 100%; }
+      .prev-quote { font-size: 13.5px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       PIN Lock Screen
+       ============================================================ -->
+  <div id="lockScreen" class="lock-screen show">
+    <div class="lock-card">
+      <div class="lock-icon">🔒</div>
+      <h2 class="lock-title">Passcode Required</h2>
+      <p class="lock-desc">Enter your 4-digit PIN to access Leafnote</p>
+      
+      <div class="pin-dots" id="pinDots">
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+      </div>
+
+      <div class="pin-error" id="pinError"></div>
+
+      <div class="pin-keypad">
+        <button type="button" class="key-btn" onclick="pressPin('1')">1</button>
+        <button type="button" class="key-btn" onclick="pressPin('2')">2</button>
+        <button type="button" class="key-btn" onclick="pressPin('3')">3</button>
+        <button type="button" class="key-btn" onclick="pressPin('4')">4</button>
+        <button type="button" class="key-btn" onclick="pressPin('5')">5</button>
+        <button type="button" class="key-btn" onclick="pressPin('6')">6</button>
+        <button type="button" class="key-btn" onclick="pressPin('7')">7</button>
+        <button type="button" class="key-btn" onclick="pressPin('8')">8</button>
+        <button type="button" class="key-btn" onclick="pressPin('9')">9</button>
+        <button type="button" class="key-btn key-action" onclick="clearPin()">Clear</button>
+        <button type="button" class="key-btn" onclick="pressPin('0')">0</button>
+        <button type="button" class="key-btn key-action" onclick="backspacePin()" title="Backspace">⌫</button>
+      </div>
+
+      <div class="pin-hint">
+        Default PIN: <strong>1234</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Main App Interface
+       ============================================================ -->
+  <main class="app">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="brand-wrap">
+        <div class="brand">
+          <div class="mark">❧</div>
+          Leafnote
+        </div>
+        <div class="sync-status" id="syncBadge" title="Firebase Realtime Database Status">
+          <span class="sync-dot" id="syncDot"></span>
+          <span id="syncText">Connecting cloud...</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-outline" onclick="openGuide()">💡 Guide</button>
+        <button class="btn-soft" onclick="openPinSettings()" title="Change PIN passcode">⚙ PIN Settings</button>
+        <button class="btn-outline" onclick="lockApp()" title="Lock reading journal">🔒 Lock</button>
+      </div>
+    </header>
+
+    <!-- One-Click Navigation Bar -->
+    <nav class="nav-bar">
+      <button class="tab-btn active" id="tab-write" onclick="switchTab('write')">
+        ✍️ Write Note
+      </button>
+      <button class="tab-btn" id="tab-shelf" onclick="switchTab('shelf')">
+        📚 My Shelf <span class="tab-badge" id="shelfBadge">0</span>
+      </button>
+      <button class="tab-btn" id="tab-studio" onclick="switchTab('studio')">
+        🎨 Share Studio
+      </button>
+      <button class="tab-btn" id="tab-wishlist" onclick="switchTab('wishlist')">
+        🔖 Want to Read <span class="tab-badge" id="wishBadge">0</span>
+      </button>
+      <button class="tab-btn" id="tab-export" onclick="switchTab('export')">
+        💾 Export & Import
+      </button>
+    </nav>
+
+    <!-- Hero Banner -->
+    <section class="hero">
+      <h1>Your reading life, beautifully remembered.</h1>
+      <p>Capture instant thoughts, deep character insights, and share-ready quotes in one serene reading studio.</p>
+    </section>
+
+    <!-- ============================================================
+         1. Write View (Plain Writing & Full Structured Review)
+         ============================================================ -->
+    <section class="view-panel active" id="view-write">
+      <div class="card">
+        <div class="writer-header">
+          <div>
+            <h2 id="formTitle" style="font-size: 20px; font-weight: 800; color: var(--deep); margin: 0 0 2px;">Write a Review</h2>
+            <span style="font-size: 12px; font-weight: 700; color: var(--muted);" id="editPill">NEW ENTRY</span>
+          </div>
+
+          <!-- Plain Writing vs Detailed Review Mode Switcher -->
+          <div class="writer-modes">
+            <button class="mode-btn active" id="mode-structured" onclick="setWritingMode('structured')">📖 Full Review</button>
+            <button class="mode-btn" id="mode-plain" onclick="setWritingMode('plain')">✍️ Plain Writing</button>
+          </div>
+        </div>
+
+        <div class="fields-grid">
+          <div>
+            <label>Book Title *</label>
+            <input id="book" placeholder="e.g. The Seven Husbands of Evelyn Hugo" oninput="updateStudioPreview()">
+          </div>
+          <div>
+            <label>Author *</label>
+            <input id="author" placeholder="e.g. Taylor Jenkins Reid" oninput="updateStudioPreview()">
+          </div>
+
+          <!-- Extra Fields (Structured Review Mode) -->
+          <div class="structured-field">
+            <label>Reference No.</label>
+            <input id="ref" placeholder="e.g. BK-042" oninput="updateStudioPreview()">
+          </div>
+          <div class="structured-field">
+            <label>Finished Date</label>
+            <input id="date" type="date">
+          </div>
+
+          <div class="full-width structured-field">
+            <label>Your Rating</label>
+            <div class="rating-row">
+              <div class="stars" id="stars"></div>
+              <span class="rating-label" id="ratingLabel">Choose a rating</span>
+            </div>
+          </div>
+
+          <!-- Review / Thoughts Text Area -->
+          <div class="full-width">
+            <label id="reviewTextLabel">Your Review & Thoughts *</label>
+            <textarea id="text" class="review-textarea" placeholder="What stayed with you after the final page? Quotes, emotions, or themes..." oninput="updateStudioPreview()"></textarea>
+          </div>
+
+          <!-- Characters (Meet the Cast) Section -->
+          <div class="full-width structured-field">
+            <div class="characters-section">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div>
+                  <label style="margin:0; font-size: 12px; color: var(--deep);">🎭 Meet the Cast (Characters)</label>
+                  <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Add memorable characters — they will be included in your Instagram cards & WhatsApp shares!</p>
+                </div>
+                <button type="button" class="btn-soft" style="padding: 5px 10px; font-size: 12px;" onclick="addCharacterField()">+ Add Character</button>
+              </div>
+              <div id="characterList"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-accent" style="padding: 11px 22px; font-size: 14px;" onclick="saveReview()">💾 Save Entry</button>
+          <button class="btn-outline" onclick="clearForm()">Clear form</button>
+          <button class="btn-soft" onclick="previewCurrentInStudio()">🎨 Preview in Studio</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         2. My Shelf View
+         ============================================================ -->
+    <section class="view-panel" id="view-shelf">
+      <div class="shelf-toolbar">
+        <div>
+          <h2 style="font-size: 21px; font-weight: 800; color: var(--deep); margin: 0;">My Shelf</h2>
+          <span style="font-size: 13px; color: var(--muted);" id="shelfSubcount">0 books recorded</span>
+        </div>
+        <input type="text" class="search-input" id="shelfSearch" placeholder="🔍 Search title, author, cast..." oninput="renderShelf()">
+      </div>
+
+      <div class="reviews-grid" id="reviewsGrid"></div>
+    </section>
+
+    <!-- ============================================================
+         3. Share Studio View
+         ============================================================ -->
+    <section class="view-panel" id="view-studio">
+      <div class="studio-grid">
+        <!-- Controls -->
+        <div class="card">
+          <h2 style="font-size: 20px; font-weight: 800; color: var(--deep); margin-bottom: 4px;">Share Studio</h2>
+          <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">
+            Turn any review and its character cast into high-resolution Instagram posts or WhatsApp status updates.
+          </p>
+
+          <label>Select Review to Share</label>
+          <select id="studioReviewSelect" style="margin-bottom: 16px;" onchange="loadReviewToStudio(this.value)">
+            <option value="">-- Current Writer Draft --</option>
+          </select>
+
+          <label>Instagram Card Aesthetic</label>
+          <div class="theme-selector">
+            <button class="theme-chip active" onclick="setStudioTheme('emerald')">🌿 Leaf Emerald</button>
+            <button class="theme-chip" onclick="setStudioTheme('parchment')">📜 Warm Parchment</button>
+            <button class="theme-chip" onclick="setStudioTheme('midnight')">🌌 Midnight Obsidian</button>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+            <button class="btn-accent" style="width:100%; justify-content:center; padding: 12px;" onclick="downloadInstagramCard()">
+              📸 Download Instagram Post (1080x1080)
+            </button>
+            <button class="btn-soft" style="width:100%; justify-content:center; padding: 12px; background: #dcf5df; color: #1e753b;" onclick="shareWhatsApp()">
+              ✆ Share to WhatsApp Status / Chat
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Instagram Card Preview -->
+        <div>
+          <div class="insta-card-preview theme-emerald" id="instaPreviewCard">
+            <div>
+              <div class="prev-badge" id="pRef">MY BOOK NOTE · BK-001</div>
+              <div class="prev-book" id="pBook">The Seven Husbands of Evelyn Hugo</div>
+              <div class="prev-auth" id="pAuthor">by Taylor Jenkins Reid</div>
+            </div>
+
+            <div>
+              <div class="prev-quote" id="pText">“They are just stories, and none of them matter anymore now that I’m telling you the truth.”</div>
+              
+              <!-- Character Cast on Preview -->
+              <div class="prev-cast-box" id="pCastBox">
+                <div class="prev-cast-title">🎭 Meet the Cast:</div>
+                <div class="prev-cast-items" id="pCastList">Evelyn Hugo (Protagonist), Celia St. James</div>
+              </div>
+            </div>
+
+            <div class="prev-stars" id="pStars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         4. Want to Read / Wishlist View
+         ============================================================ -->
+    <section class="view-panel" id="view-wishlist">
+      <div class="card" style="max-width: 800px; margin: 0 auto;">
+        <h2 style="font-size: 20px; font-weight: 800; color: var(--deep); margin-bottom: 4px;">Want to Read</h2>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">Keep a quiet list of upcoming books waiting on your reading horizon.</p>
+
+        <div class="wishlist-add-box">
+          <input id="wishBook" placeholder="Book title (e.g. Tomorrow, and Tomorrow, and Tomorrow)">
+          <input id="wishAuthor" placeholder="Author">
+          <button class="btn-accent" style="white-space:nowrap; padding: 10px 20px;" onclick="addWish()">+ Add to List</button>
+        </div>
+
+        <div id="wishListContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         5. Export & Backup View
+         ============================================================ -->
+    <section class="view-panel" id="view-export">
+      <div class="card" style="max-width: 800px; margin: 0 auto;">
+        <h2 style="font-size: 20px; font-weight: 800; color: var(--deep); margin-bottom: 4px;">Bring Your Library With You</h2>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">Download complete backups in standard open formats or print archival PDF sheets.</p>
+
+        <div class="export-grid">
+          <div class="export-card" onclick="exportJSON()">
+            <h3>📄 JSON Archive</h3>
+            <p>Full structured raw backup including cast, timestamps, and reviews.</p>
+          </div>
+          <div class="export-card" onclick="exportCSV()">
+            <h3>📊 CSV Spreadsheet</h3>
+            <p>Ready for Excel, Google Sheets, or Notion database import.</p>
+          </div>
+          <div class="export-card" onclick="exportPDF()">
+            <h3>🖨️ PDF Printable Note</h3>
+            <p>Single-page elegant review sheet formatted for print/PDF.</p>
+          </div>
+        </div>
+
+        <div style="border-top: 1px dashed #d5ded2; padding-top: 20px;">
+          <label>Import Reviews from File</label>
+          <label style="display:block; text-align:center; padding:16px; border:2px dashed #b5c4b2; border-radius:14px; cursor:pointer; font-weight:700; color:#495853; background:#fafbf8;">
+            ↥ Click to Choose File (.json, .csv, .pdf, .txt)
+            <input type="file" id="fileInput" accept=".json,.csv,.txt,.pdf" style="display:none;" onchange="importFile(event)">
+          </label>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Notice Banner & Modals -->
+  <div id="notice" class="notice"></div>
+  <div id="modal" class="modal">
+    <div class="modalbox" id="modalbox"></div>
+  </div>
+
+  <!-- ============================================================
+       Application Script with Firebase Realtime Database Modular SDK
+       ============================================================ -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
+    import { 
+      getDatabase, 
+      ref, 
+      set, 
+      push, 
+      onValue, 
+      remove, 
+      update 
+    } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyADI6UZBkJUouuFFe2QXXY7AJhf6rn5upE",
+      authDomain: "reading-hub-1b078.firebaseapp.com",
+      databaseURL: "https://reading-hub-1b078-default-rtdb.firebaseio.com",
+      projectId: "reading-hub-1b078",
+      storageBucket: "reading-hub-1b078.firebasestorage.app",
+      messagingSenderId: "1042128402557",
+      appId: "1:1042128402557:web:ffaea4c169248e43609914",
+      measurementId: "G-WQL4M5M52C"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    try { getAnalytics(app); } catch(e) {}
+    const db = getDatabase(app);
+    const reviewsRef = ref(db, 'reviews');
+    const wishlistRef = ref(db, 'wishlist');
+
+    // App State
+    let reviews = [];
+    let wishlist = [];
+    let editing = null;
+    let rating = 5;
+    let writingMode = 'structured'; // 'structured' or 'plain'
+    let studioTheme = 'emerald';
+    let currentPinInput = '';
+
+    const DEFAULT_PIN = '1234';
+
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+
+    function getSavedPin() {
+      return localStorage.getItem('leafnote_pin') || DEFAULT_PIN;
+    }
+
+    // Load initial local backup
+    try {
+      reviews = JSON.parse(localStorage.getItem('leafnoteReviews') || '[]');
+      wishlist = JSON.parse(localStorage.getItem('leafnoteWishlist') || '[]');
+    } catch(e) {
+      reviews = [];
+      wishlist = [];
+    }
+
+    // ============================================================
+    // PIN Authentication
+    // ============================================================
+    function checkInitialAuth() {
+      const isUnlocked = sessionStorage.getItem('leafnote_unlocked') === 'true';
+      if (isUnlocked) {
+        $('lockScreen').classList.remove('show');
+      } else {
+        $('lockScreen').classList.add('show');
+      }
+    }
+
+    function pressPin(digit) {
+      if (currentPinInput.length >= 4) return;
+      currentPinInput += digit;
+      updatePinUI();
+      $('pinError').textContent = '';
+
+      if (currentPinInput.length === 4) {
+        setTimeout(verifyPin, 100);
+      }
+    }
+
+    function backspacePin() {
+      if (currentPinInput.length > 0) {
+        currentPinInput = currentPinInput.slice(0, -1);
+        updatePinUI();
+        $('pinError').textContent = '';
+      }
+    }
+
+    function clearPin() {
+      currentPinInput = '';
+      updatePinUI();
+      $('pinError').textContent = '';
+    }
+
+    function updatePinUI() {
+      const dots = document.querySelectorAll('.pin-dot');
+      dots.forEach((dot, index) => {
+        if (index < currentPinInput.length) {
+          dot.classList.add('filled');
+        } else {
+          dot.classList.remove('filled');
+        }
+      });
+    }
+
+    function verifyPin() {
+      const validPin = getSavedPin();
+      if (currentPinInput === validPin) {
+        sessionStorage.setItem('leafnote_unlocked', 'true');
+        $('lockScreen').classList.remove('show');
+        clearPin();
+        toast('Welcome back to Leafnote!');
+      } else {
+        const dotsContainer = $('pinDots');
+        dotsContainer.classList.add('shake');
+        $('pinError').textContent = 'Incorrect PIN. Try again.';
+        setTimeout(() => {
+          dotsContainer.classList.remove('shake');
+          clearPin();
+        }, 500);
+      }
+    }
+
+    function lockApp() {
+      sessionStorage.removeItem('leafnote_unlocked');
+      clearPin();
+      $('lockScreen').classList.add('show');
+      toast('Shelf locked.');
+    }
+
+    function openPinSettings() {
+      $('modalbox').innerHTML = `
+        <h2>⚙ PIN Security Settings</h2>
+        <p>Update your 4-digit passcode for accessing your reading journal.</p>
+        <div style="display:flex; flex-direction:column; gap:12px; margin: 18px 0;">
+          <div>
+            <label>Current PIN</label>
+            <input type="password" id="curPin" maxlength="6" placeholder="Enter current PIN (default: 1234)">
+          </div>
+          <div>
+            <label>New 4-Digit PIN</label>
+            <input type="password" id="newPin" maxlength="6" placeholder="e.g. 5678">
+          </div>
+          <div>
+            <label>Confirm New PIN</label>
+            <input type="password" id="confirmPin" maxlength="6" placeholder="Re-enter new PIN">
+          </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+          <button class="btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn-dark" onclick="saveNewPin()">Save New PIN</button>
+        </div>
+      `;
+      $('modal').classList.add('show');
+    }
+
+    function saveNewPin() {
+      const cur = $('curPin').value.trim();
+      const next = $('newPin').value.trim();
+      const confirm = $('confirmPin').value.trim();
+      const currentSaved = getSavedPin();
+
+      if (cur !== currentSaved) {
+        toast('Current PIN is incorrect.');
+        return;
+      }
+      if (!next || next.length < 4) {
+        toast('New PIN must be at least 4 digits.');
+        return;
+      }
+      if (next !== confirm) {
+        toast('New PIN and confirmation do not match.');
+        return;
+      }
+
+      localStorage.setItem('leafnote_pin', next);
+      closeModal();
+      toast('PIN successfully updated!');
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (!$('lockScreen').classList.contains('show')) {
+        // Shortcut: Ctrl+S or Cmd+S to save review
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          saveReview();
+        }
+        return;
+      }
+      if (e.key >= '0' && e.key <= '9') {
+        pressPin(e.key);
+      } else if (e.key === 'Backspace') {
+        backspacePin();
+      } else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') {
+        clearPin();
+      }
+    });
+
+    // ============================================================
+    // Navigation Tabs Switcher (One Click Away)
+    // ============================================================
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+
+      const activeBtn = $(`tab-${tabId}`);
+      const activePanel = $(`view-${tabId}`);
+      if (activeBtn) activeBtn.classList.add('active');
+      if (activePanel) activePanel.classList.add('active');
+
+      if (tabId === 'shelf') renderShelf();
+      if (tabId === 'studio') {
+        populateStudioSelect();
+        updateStudioPreview();
+      }
+      if (tabId === 'wishlist') renderWishlist();
+    }
+
+    // ============================================================
+    // Plain Writing vs Structured Review Mode
+    // ============================================================
+    function setWritingMode(mode) {
+      writingMode = mode;
+      $('mode-structured').classList.toggle('active', mode === 'structured');
+      $('mode-plain').classList.toggle('active', mode === 'plain');
+
+      const structuredFields = document.querySelectorAll('.structured-field');
+      const textLabel = $('reviewTextLabel');
+      const textArea = $('text');
+
+      if (mode === 'plain') {
+        structuredFields.forEach(el => el.style.display = 'none');
+        textLabel.textContent = 'Plain Thoughts, Notes & Reflections *';
+        textArea.className = 'plain-textarea';
+        textArea.placeholder = 'Start writing freely without structure — capture feelings, favorite passages, ideas, or quick review thoughts...';
+      } else {
+        structuredFields.forEach(el => el.style.display = '');
+        textLabel.textContent = 'Your Review & Thoughts *';
+        textArea.className = 'review-textarea';
+        textArea.placeholder = 'What stayed with you after the final page? Quotes, emotions, or themes...';
+      }
+    }
+
+    // ============================================================
+    // Firebase Realtime Synchronization
+    // ============================================================
+    function updateSyncStatus(connected, text) {
+      const badge = $('syncBadge');
+      const txt = $('syncText');
+      if (!badge || !txt) return;
+      if (connected) {
+        badge.classList.remove('offline');
+        txt.textContent = text || 'Cloud Synced';
+      } else {
+        badge.classList.add('offline');
+        txt.textContent = text || 'Local Mode';
+      }
+    }
+
+    function persistLocal() {
+      try {
+        localStorage.setItem('leafnoteReviews', JSON.stringify(reviews));
+        localStorage.setItem('leafnoteWishlist', JSON.stringify(wishlist));
+        return true;
+      } catch(e) {
+        return false;
+      }
+    }
+
+    function setupFirebaseListeners() {
+      onValue(reviewsRef, (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+          if (Array.isArray(val)) {
+            reviews = val.filter(Boolean);
+          } else {
+            reviews = Object.keys(val).map(key => ({
+              ...val[key],
+              id: val[key].id || key
+            }));
+          }
+          reviews.sort((a, b) => (b.updated || '').localeCompare(a.updated || ''));
+        } else {
+          if (reviews.length === 0) reviews = [];
+        }
+        persistLocal();
+        updateCounts();
+        renderShelf();
+        populateStudioSelect();
+        updateSyncStatus(true, 'Cloud Synced');
+      }, (error) => {
+        console.warn('Firebase RTDB reviews read warning:', error);
+        updateSyncStatus(false, 'Local Backup');
+      });
+
+      onValue(wishlistRef, (snapshot) => {
+        const val = snapshot.val();
+        if (val) {
+          if (Array.isArray(val)) {
+            wishlist = val.filter(Boolean);
+          } else {
+            wishlist = Object.keys(val).map(key => ({
+              ...val[key],
+              id: val[key].id || key
+            }));
+          }
+          wishlist.sort((a, b) => (b.created || '').localeCompare(a.created || ''));
+        } else {
+          if (wishlist.length === 0) wishlist = [];
+        }
+        persistLocal();
+        updateCounts();
+        renderWishlist();
+        updateSyncStatus(true, 'Cloud Synced');
+      }, (error) => {
+        console.warn('Firebase RTDB wishlist read warning:', error);
+      });
+
+      const connectedRef = ref(db, '.info/connected');
+      onValue(connectedRef, (snap) => {
+        if (snap.val() === true) {
+          updateSyncStatus(true, 'Cloud Synced');
+        } else {
+          updateSyncStatus(false, 'Connecting...');
+        }
+      });
+    }
+
+    function updateCounts() {
+      $('shelfBadge').textContent = reviews.length;
+      $('wishBadge').textContent = wishlist.length;
+      $('shelfSubcount').textContent = `${reviews.length} book${reviews.length === 1 ? '' : 's'} recorded`;
+    }
+
+    // ============================================================
+    // Characters & Cast Management
+    // ============================================================
+    function addCharacterField(c = {}) {
+      const list = $('characterList');
+      const div = document.createElement('div');
+      div.className = 'char-entry';
+      div.innerHTML = `
+        <button type="button" class="remove-char-btn" onclick="this.parentElement.remove(); updateStudioPreview()" title="Remove character">×</button>
+        <div class="char-row">
+          <input type="text" class="char-name" placeholder="Character Name (e.g. Evelyn Hugo)" value="${esc(c.name || '')}" oninput="updateStudioPreview()">
+          <input type="text" class="char-role" placeholder="Role / Trait (e.g. Hollywood Legend)" value="${esc(c.role || '')}" oninput="updateStudioPreview()">
+        </div>
+        <textarea class="char-notes" placeholder="Personality, key quotes, or thoughts on this character" oninput="updateStudioPreview()">${esc(c.notes || '')}</textarea>
+      `;
+      list.appendChild(div);
+      updateStudioPreview();
+    }
+
+    function getCharactersFromForm() {
+      return Array.from(document.querySelectorAll('.char-entry')).map(el => ({
+        name: el.querySelector('.char-name').value.trim(),
+        role: el.querySelector('.char-role').value.trim(),
+        notes: el.querySelector('.char-notes').value.trim()
+      })).filter(c => c.name);
+    }
+
+    // ============================================================
+    // Stars & Ratings
+    // ============================================================
+    function renderStars() {
+      $('stars').innerHTML = [1, 2, 3, 4, 5].map(n => `
+        <button class="star ${n <= rating ? 'on' : ''}" onclick="setRating(${n})" aria-label="${n} stars" type="button">★</button>
+      `).join('');
+      const labels = ['', 'Not for me', 'An okay read', 'Good', 'Loved it', 'A masterpiece / All-time favorite'];
+      $('ratingLabel').textContent = rating ? `${rating} / 5 — ${labels[rating]}` : 'Choose a rating';
+    }
+
+    function setRating(n) {
+      rating = n;
+      renderStars();
+      updateStudioPreview();
+    }
+
+    function value(id) {
+      return ($(id) && $(id).value.trim()) || '';
+    }
+
+    function currentFormReview() {
+      const chars = getCharactersFromForm();
+      return {
+        id: editing || ('rev_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5)),
+        book: value('book') || 'Untitled Book',
+        author: value('author') || 'Unknown Author',
+        ref: value('ref') || ('BK-' + String(reviews.length + 1).padStart(3, '0')),
+        date: value('date') || new Date().toISOString().slice(0, 10),
+        rating: rating || 5,
+        text: value('text'),
+        characters: chars,
+        mode: writingMode,
+        updated: new Date().toISOString()
+      };
+    }
+
+    // ============================================================
+    // Save, Edit, Clear Reviews
+    // ============================================================
+    async function saveReview() {
+      const bookTitle = value('book');
+      const reviewText = value('text');
+
+      if (!bookTitle || !reviewText) {
+        toast('Please enter a book title and your review thoughts.');
+        return;
+      }
+
+      const r = currentFormReview();
+      const idx = reviews.findIndex(x => x.id === r.id);
+      const isEdit = idx > -1;
+
+      if (isEdit) reviews[idx] = r;
+      else reviews.unshift(r);
+
+      persistLocal();
+      updateCounts();
+      renderShelf();
+      clearForm();
+
+      try {
+        await set(ref(db, 'reviews/' + r.id), r);
+        toast(isEdit ? 'Review updated & synced to cloud.' : 'Saved & added to your shelf!');
+      } catch (err) {
+        console.error('Firebase save error:', err);
+        toast('Saved locally.');
+      }
+    }
+
+    function clearForm() {
+      editing = null;
+      rating = 5;
+      ['book', 'author', 'ref', 'text'].forEach(id => { if ($(id)) $(id).value = ''; });
+      $('date').value = new Date().toISOString().slice(0, 10);
+      $('characterList').innerHTML = '';
+      $('formTitle').textContent = 'Write a Review';
+      $('editPill').textContent = 'NEW ENTRY';
+      renderStars();
+      updateStudioPreview();
+    }
+
+    function editReview(id) {
+      const r = reviews.find(x => x.id === id);
+      if (!r) return;
+      editing = id;
+
+      $('book').value = r.book || '';
+      $('author').value = r.author || '';
+      $('ref').value = r.ref || '';
+      $('date').value = r.date || new Date().toISOString().slice(0, 10);
+      $('text').value = r.text || '';
+      
+      $('characterList').innerHTML = '';
+      (r.characters || []).forEach(c => addCharacterField(c));
+
+      rating = r.rating || 5;
+      $('formTitle').textContent = 'Edit Review';
+      $('editPill').textContent = 'EDITING';
+
+      if (r.mode === 'plain') setWritingMode('plain');
+      else setWritingMode('structured');
+
+      renderStars();
+      switchTab('write');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteReview(id) {
+      if (!confirm('Are you sure you want to delete this book review?')) return;
+      reviews = reviews.filter(r => r.id !== id);
+      persistLocal();
+      updateCounts();
+      renderShelf();
+      closeModal();
+
+      remove(ref(db, 'reviews/' + id)).then(() => {
+        toast('Review deleted from cloud shelf.');
+      }).catch(() => {
+        toast('Review deleted locally.');
+      });
+    }
+
+    // ============================================================
+    // Shelf Rendering
+    // ============================================================
+    function renderShelf() {
+      const query = (value('shelfSearch') || '').toLowerCase();
+      const grid = $('reviewsGrid');
+
+      const filtered = reviews.filter(r => {
+        const matchTitle = (r.book || '').toLowerCase().includes(query);
+        const matchAuthor = (r.author || '').toLowerCase().includes(query);
+        const matchText = (r.text || '').toLowerCase().includes(query);
+        const matchChar = (r.characters || []).some(c => 
+          (c.name || '').toLowerCase().includes(query) || 
+          (c.role || '').toLowerCase().includes(query)
+        );
+        return matchTitle || matchAuthor || matchText || matchChar;
+      });
+
+      if (!filtered.length) {
+        grid.innerHTML = `
+          <div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--muted); background: #fff; border: 1px dashed var(--line); border-radius: var(--radius-lg);">
+            <div style="font-size: 32px; margin-bottom: 8px;">📚</div>
+            <h3 style="font-size: 17px; color: var(--deep); margin-bottom: 4px;">No reviews found</h3>
+            <p style="font-size: 13px;">${query ? 'Try a different search keyword.' : 'Write your first book review to build your shelf.'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(r => {
+        const charCount = (r.characters || []).length;
+        const charBadges = (r.characters || []).slice(0, 3).map(c => `
+          <span class="char-chip">🎭 ${esc(c.name)}${c.role ? ` (${esc(c.role)})` : ''}</span>
+        `).join('');
+
+        return `
+          <div class="review-card">
+            <div>
+              <div class="review-top">
+                <div class="book-cover">${esc((r.book && r.book[0]) || 'B')}</div>
+                <div class="review-meta">
+                  <div class="review-title" title="${esc(r.book)}">${esc(r.book)}</div>
+                  <div class="review-author">by ${esc(r.author || 'Unknown')} · ${esc(r.ref || '')}</div>
+                  <div class="card-stars">${'★'.repeat(r.rating || 0)}${'☆'.repeat(5 - (r.rating || 0))}</div>
+                </div>
+              </div>
+
+              <p class="review-snippet">${esc(r.text || '')}</p>
+
+              ${charCount > 0 ? `<div class="character-chips">${charBadges}${charCount > 3 ? `<span class="char-chip">+${charCount - 3} more</span>` : ''}</div>` : ''}
+            </div>
+
+            <div class="card-bottom">
+              <span>📅 ${esc(r.date || '')}</span>
+              <div class="card-actions">
+                <button class="btn-soft" style="padding: 4px 10px; font-size: 12px;" onclick="loadReviewToStudioById('${r.id}')">🎨 Studio</button>
+                <button class="btn-outline" style="padding: 4px 10px; font-size: 12px;" onclick="editReview('${r.id}')">✏️ Edit</button>
+                <button class="btn-outline" style="padding: 4px 8px; font-size: 12px; color: var(--coral);" onclick="deleteReview('${r.id}')" title="Delete">🗑️</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ============================================================
+    // Share Studio & Instagram Canvas Generator
+    // ============================================================
+    function setStudioTheme(theme) {
+      studioTheme = theme;
+      document.querySelectorAll('.theme-chip').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.theme-chip')).find(btn => btn.textContent.toLowerCase().includes(theme));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const preview = $('instaPreviewCard');
+      preview.className = `insta-card-preview theme-${theme}`;
+      updateStudioPreview();
+    }
+
+    function populateStudioSelect() {
+      const sel = $('studioReviewSelect');
+      if (!sel) return;
+      const cur = sel.value;
+      sel.innerHTML = `<option value="">-- Current Writer Draft --</option>` +
+        reviews.map(r => `<option value="${r.id}">${esc(r.book)} (${esc(r.author)})</option>`).join('');
+      sel.value = cur;
+    }
+
+    function loadReviewToStudio(id) {
+      updateStudioPreview();
+    }
+
+    function loadReviewToStudioById(id) {
+      switchTab('studio');
+      $('studioReviewSelect').value = id;
+      updateStudioPreview();
+    }
+
+    function previewCurrentInStudio() {
+      switchTab('studio');
+      $('studioReviewSelect').value = '';
+      updateStudioPreview();
+    }
+
+    function getSelectedStudioReview() {
+      const selId = $('studioReviewSelect').value;
+      if (selId) {
+        const found = reviews.find(x => x.id === selId);
+        if (found) return found;
+      }
+      return currentFormReview();
+    }
+
+    function updateStudioPreview() {
+      const r = getSelectedStudioReview();
+      $('pRef').textContent = 'MY BOOK NOTE · ' + (r.ref || 'BK-001');
+      $('pBook').textContent = r.book || 'Your next great read';
+      $('pAuthor').textContent = 'by ' + (r.author || 'an author you admire');
+      $('pText').textContent = r.text ? `“${r.text}”` : '“A thoughtful review deserves a beautiful little home.”';
+      $('pStars').textContent = '★'.repeat(r.rating || 0);
+
+      const castBox = $('pCastBox');
+      const castList = $('pCastList');
+      if (r.characters && r.characters.length > 0) {
+        castBox.style.display = 'block';
+        castList.textContent = r.characters.map(c => `${c.name}${c.role ? ` (${c.role})` : ''}`).join('  •  ');
+      } else {
+        castBox.style.display = 'none';
+      }
+    }
+
+    // Canvas Post Generator with Character Support
+    function downloadInstagramCard() {
+      const r = getSelectedStudioReview();
+      if (!r.book) {
+        toast('Please enter or select a review first.');
+        return;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1080;
+      const ctx = canvas.getContext('2d');
+
+      // Theme Backgrounds
+      if (studioTheme === 'emerald') {
+        ctx.fillStyle = '#123d39';
+        ctx.fillRect(0, 0, 1080, 1080);
+        // Lime circle accent
+        ctx.fillStyle = '#d8ee75';
+        ctx.beginPath();
+        ctx.arc(920, 160, 240, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+      } else if (studioTheme === 'parchment') {
+        ctx.fillStyle = '#fbf8ef';
+        ctx.fillRect(0, 0, 1080, 1080);
+        // Border frame
+        ctx.strokeStyle = '#ded7c3';
+        ctx.lineWidth = 14;
+        ctx.strokeRect(30, 30, 1020, 1020);
+
+        ctx.fillStyle = '#1a1a18';
+      } else if (studioTheme === 'midnight') {
+        ctx.fillStyle = '#0d171d';
+        ctx.fillRect(0, 0, 1080, 1080);
+        // Gradient circle
+        const grad = ctx.createLinearGradient(700, 0, 1080, 380);
+        grad.addColorStop(0, '#c084fc');
+        grad.addColorStop(1, '#ff7758');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(900, 170, 220, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#f8fafc';
+      }
+
+      // 1. Header Tag
+      ctx.font = 'bold 30px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+      if (studioTheme === 'parchment') ctx.fillStyle = '#68736f';
+      else ctx.fillStyle = '#d6e4df';
+      ctx.fillText(`LEAFNOTE BOOK NOTE  •  ${r.ref || 'BK-001'}`, 90, 120);
+
+      // 2. Book Title
+      ctx.font = 'bold 64px Georgia, serif';
+      if (studioTheme === 'parchment') ctx.fillStyle = '#162220';
+      else ctx.fillStyle = '#ffffff';
+      wrapText(ctx, r.book, 90, 220, 720, 76);
+
+      // 3. Author
+      ctx.font = '32px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+      if (studioTheme === 'parchment') ctx.fillStyle = '#5c6966';
+      else ctx.fillStyle = '#b8ceca';
+      ctx.fillText(`by ${r.author || 'Unknown Author'}`, 92, 360);
+
+      // 4. Review Quote
+      ctx.font = 'italic 34px Georgia, serif';
+      if (studioTheme === 'parchment') ctx.fillStyle = '#222d2b';
+      else ctx.fillStyle = '#ffffff';
+      const cleanQuote = `“${(r.text || '').replace(/\s+/g, ' ').trim()}”`;
+      wrapText(ctx, cleanQuote, 90, 460, 900, 50, 4);
+
+      // 5. CHARACTERS / CAST SECTION (Rendered dynamically)
+      if (r.characters && r.characters.length > 0) {
+        const boxY = 690;
+        ctx.fillStyle = studioTheme === 'parchment' ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.12)';
+        roundRect(ctx, 90, boxY, 900, 140, 20);
+
+        // Cast Header
+        ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+        ctx.fillStyle = studioTheme === 'parchment' ? '#b8860b' : '#d8ee75';
+        ctx.fillText('🎭 MEET THE CAST', 120, boxY + 42);
+
+        // Cast Items
+        ctx.font = '24px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+        if (studioTheme === 'parchment') ctx.fillStyle = '#1e2422';
+        else ctx.fillStyle = '#ffffff';
+
+        const castText = r.characters.map(c => `${c.name}${c.role ? ` (${c.role})` : ''}`).join('  •  ');
+        wrapText(ctx, castText, 120, boxY + 85, 840, 36, 2);
+      }
+
+      // 6. Stars Rating & Footer
+      ctx.font = '46px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillText('★'.repeat(r.rating || 0), 90, 960);
+
+      ctx.font = 'bold 22px -apple-system, BlinkMacSystemFont, Arial, sans-serif';
+      if (studioTheme === 'parchment') ctx.fillStyle = '#899692';
+      else ctx.fillStyle = '#789c96';
+      ctx.fillText('leafnote.app', 880, 960);
+
+      // Trigger Download
+      const link = document.createElement('a');
+      link.download = `${(r.book || 'book-review').replace(/\W+/g, '-').toLowerCase()}-instagram.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      toast('Instagram post image downloaded (1080x1080)!');
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 10) {
+      const words = (text || '').split(/\s+/);
+      let line = '';
+      let linesDrawn = 0;
+
+      for (let n = 0; n < words.length; n++) {
+        if (linesDrawn >= maxLines) break;
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+
+        if (testWidth > maxWidth && n > 0) {
+          ctx.fillText(line, x, y);
+          line = words[n] + ' ';
+          y += lineHeight;
+          linesDrawn++;
+        } else {
+          line = testLine;
+        }
+      }
+      if (linesDrawn < maxLines) {
+        ctx.fillText(line, x, y);
+      }
+    }
+
+    function roundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // WhatsApp Share with Full Character Cast Formatted
+    function shareWhatsApp() {
+      const r = getSelectedStudioReview();
+      if (!r.book) {
+        toast('Please enter or select a review first.');
+        return;
+      }
+
+      let castFormatted = '';
+      if (r.characters && r.characters.length > 0) {
+        castFormatted = '\n\n🎭 *Meet the Cast:*\n' + 
+          r.characters.map(c => `• *${c.name}*${c.role ? ` (${c.role})` : ''}${c.notes ? `: ${c.notes}` : ''}`).join('\n');
+      }
+
+      const message = `📚 *${r.book}* — ${r.author || 'Unknown'}\n` +
+        `${'⭐'.repeat(r.rating || 5)}\n\n` +
+        `"${r.text}"` +
+        castFormatted +
+        `\n\n📖 _Note Ref: ${r.ref || 'Leafnote'}_ #BookReview #ReadingJournal`;
+
+      window.open('https://wa.me/?text=' + encodeURIComponent(message), '_blank');
+      toast('Opening WhatsApp share…');
+    }
+
+    // ============================================================
+    // Want to Read / Wishlist
+    // ============================================================
+    async function addWish() {
+      const book = value('wishBook');
+      const author = value('wishAuthor');
+      if (!book) {
+        toast('Please enter a book title.');
+        return;
+      }
+
+      const item = {
+        id: 'wish_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+        book,
+        author,
+        created: new Date().toISOString()
+      };
+
+      wishlist.unshift(item);
+      persistLocal();
+      updateCounts();
+      $('wishBook').value = '';
+      $('wishAuthor').value = '';
+      renderWishlist();
+
+      try {
+        await set(ref(db, 'wishlist/' + item.id), item);
+        toast('Added to want-to-read list & cloud!');
+      } catch (err) {
+        toast('Added to want-to-read list.');
+      }
+    }
+
+    function renderWishlist() {
+      const container = $('wishListContainer');
+      if (!wishlist.length) {
+        container.innerHTML = `<div style="text-align:center; padding:32px; color:var(--muted); background:#fcfdfa; border:1px dashed var(--line); border-radius:var(--radius-md);">A quiet shelf waiting for your next reading discoveries.</div>`;
+        return;
+      }
+
+      container.innerHTML = wishlist.map(w => `
+        <div style="background:#fff; border:1px solid var(--line); border-radius:var(--radius-md); padding:14px; display:flex; justify-content:space-between; align-items:center; box-shadow:var(--shadow-sm);">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div style="width:36px; height:46px; background:linear-gradient(135deg,#cfc077,#77631f); color:#fff; border-radius:6px; display:grid; place-items:center; font-weight:800; font-family:Georgia;">${esc(w.book[0] || 'B')}</div>
+            <div>
+              <div style="font-weight:700; font-size:15px; color:var(--deep);">${esc(w.book)}</div>
+              <div style="font-size:12.5px; color:var(--muted);">by ${esc(w.author || 'Author to add later')}</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-soft" style="padding:6px 10px; font-size:12px;" onclick="moveToReview('${w.id}')">✍️ Review this</button>
+            <button class="btn-outline" style="padding:6px 10px; font-size:12px; color:var(--coral);" onclick="deleteWish('${w.id}')">×</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function moveToReview(id) {
+      const w = wishlist.find(x => x.id === id);
+      if (!w) return;
+      $('book').value = w.book;
+      $('author').value = w.author || '';
+      switchTab('write');
+      deleteWish(id);
+      toast('Moved book to your review writer!');
+    }
+
+    async function deleteWish(id) {
+      wishlist = wishlist.filter(w => w.id !== id);
+      persistLocal();
+      updateCounts();
+      renderWishlist();
+
+      try {
+        await remove(ref(db, 'wishlist/' + id));
+      } catch (err) {}
+    }
+
+    // ============================================================
+    // Exports (JSON, CSV, PDF) & Import
+    // ============================================================
+    function downloadBlob(name, content, type) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([content], { type }));
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function exportJSON() {
+      downloadBlob('leafnote-reading-journal.json', JSON.stringify(reviews, null, 2), 'application/json');
+      toast('JSON backup exported.');
+    }
+
+    function exportCSV() {
+      const head = ['Book Title', 'Author', 'Reference No', 'Finished On', 'Rating', 'Review Text', 'Characters'];
+      const rows = reviews.map(r => {
+        const cast = (r.characters || []).map(c => `${c.name} (${c.role}): ${c.notes}`).join(' | ');
+        return [r.book, r.author, r.ref, r.date, r.rating, r.text, cast];
+      });
+      const csv = [head, ...rows].map(a => a.map(v => '"' + String(v ?? '').replaceAll('"', '""') + '"').join(',')).join('\n');
+      downloadBlob('leafnote-reading-journal.csv', csv, 'text/csv');
+      toast('CSV spreadsheet exported.');
+    }
+
+    function exportPDF() {
+      const r = getSelectedStudioReview();
+      if (!r || !r.book) {
+        toast('Please choose or save a review first.');
+        return;
+      }
+      const win = window.open('', '_blank');
+      let castHtml = '';
+      if (r.characters && r.characters.length > 0) {
+        castHtml = `
+          <div style="margin-top:28px; border-top:1px dashed #b8c4be; padding-top:16px;">
+            <div style="font-family:Arial; font-size:12px; font-weight:800; letter-spacing:1.5px; color:#687;">MEET THE CHARACTERS (CAST)</div>
+            <ul style="margin-top:10px; padding-left:20px; font-size:15px; line-height:1.7;">
+              ${r.characters.map(c => `<li><b>${esc(c.name)}</b> ${c.role ? `(${esc(c.role)})` : ''}${c.notes ? `: ${esc(c.notes)}` : ''}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      }
+
+      win.document.write(`
+        <!doctype html>
+        <html>
+        <head>
+          <title>${esc(r.book)} — Leafnote</title>
+          <style>
+            body { font-family: Georgia, serif; max-width: 720px; margin: 60px auto; color: #183d39; padding: 30px; }
+            .tag { font: 700 12px Arial, sans-serif; letter-spacing: 2px; color: #687; }
+            .title { font-size: 38px; margin: 16px 0 6px; }
+            .author { font: 19px Arial, sans-serif; color: #687; }
+            .line { height: 5px; background: #d8ee75; margin: 26px 0; }
+            .rating { color: #f59e0b; font: 24px Arial, sans-serif; margin-bottom: 20px; }
+            p { font-size: 17px; line-height: 1.75; color: #293634; }
+          </style>
+        </head>
+        <body>
+          <div class="tag">LEAFNOTE BOOK REVIEW · ${esc(r.ref || 'BK-001')}</div>
+          <h1 class="title">${esc(r.book)}</h1>
+          <div class="author">by ${esc(r.author || 'Unknown')} · Finished ${esc(r.date || '')}</div>
+          <div class="line"></div>
+          <div class="rating">${'★'.repeat(r.rating || 0)}${'☆'.repeat(5 - (r.rating || 0))}</div>
+          <p>${esc(r.text || '').replaceAll('\n', '<br>')}</p>
+          ${castHtml}
+          <script>window.onload = () => window.print();<\/script>
+        </body>
+        </html>
+      `);
+      win.document.close();
+      toast('Print dialog opened — choose "Save as PDF".');
+    }
+
+    async function importFile(e) {
+      const f = e.target.files[0];
+      if (!f) return;
+      const rd = new FileReader();
+      rd.onload = async () => {
+        try {
+          const raw = f.name.toLowerCase().endsWith('.pdf') ? pdfText(rd.result) : rd.result;
+          const data = parseImport(f.name, raw);
+          if (!data.length) throw Error();
+
+          reviews = [...data, ...reviews];
+          persistLocal();
+          updateCounts();
+          renderShelf();
+
+          for (const item of data) {
+            try { await set(ref(db, 'reviews/' + item.id), item); } catch(err) {}
+          }
+          toast(`${data.length} review${data.length > 1 ? 's' : ''} imported & synced.`);
+        } catch {
+          toast('Could not read that file. Try a JSON, CSV, or text file.');
+        }
+      };
+      if (f.name.toLowerCase().endsWith('.pdf')) rd.readAsArrayBuffer(f);
+      else rd.readAsText(f);
+      e.target.value = '';
+    }
+
+    function pdfText(buffer) {
+      const s = new TextDecoder('latin1').decode(buffer);
+      const parts = [];
+      for (const m of s.matchAll(/\(([^()]*(?:\\.[^()]*)*)\)/g)) parts.push(m[1].replace(/\\([()\\])/g, '$1'));
+      return parts.join(' ').replace(/\s+/g, ' ').trim() || 'Scanned PDF Note';
+    }
+
+    function parseImport(name, raw) {
+      if (name.endsWith('.json')) {
+        const d = JSON.parse(raw);
+        return (Array.isArray(d) ? d : [d]).map(normalizeImport);
+      }
+      if (name.endsWith('.csv')) {
+        const lines = raw.trim().split(/\r?\n/);
+        const head = lines.shift().split(',').map(x => x.toLowerCase());
+        return lines.map(line => {
+          const a = [...line.matchAll(/(?:^|,)("(?:[^"]|"")*"|[^,]*)/g)].map(x => x[1].replace(/^"|"$/g, '').replaceAll('""', '"'));
+          const o = {};
+          head.forEach((h, i) => o[h] = a[i] || '');
+          return normalizeImport(o);
+        }).filter(r => r.book);
+      }
+      return [normalizeImport({ book: 'Imported Note', author: 'Unknown', text: raw })];
+    }
+
+    function normalizeImport(o) {
+      const get = (...keys) => keys.map(k => o[k] || o[k.toLowerCase()]).find(Boolean) || '';
+      return {
+        id: 'rev_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+        book: get('book', 'title', 'book title'),
+        author: get('author'),
+        ref: get('ref', 'reference no'),
+        date: get('date', 'finished on') || new Date().toISOString().slice(0, 10),
+        rating: +get('rating') || 5,
+        text: get('text', 'review', 'your review'),
+        characters: [],
+        updated: new Date().toISOString()
+      };
+    }
+
+    // ============================================================
+    // Guide Modal & Utilities
+    // ============================================================
+    function openGuide() {
+      $('modalbox').innerHTML = `
+        <h2>🌿 How Leafnote Works</h2>
+        <p><b>✍️ Plain & Full Writing:</b> Capture instant plain reading thoughts on entrance or toggle to Full Review mode with 5-star ratings and character cast tracking.</p>
+        <p><b>🎭 Character Cast:</b> Add character names, roles, and insights. They automatically appear on your generated Instagram post cards and WhatsApp shares.</p>
+        <p><b>⚡ Firebase Realtime Sync:</b> Every entry, wishlist item, and edit is automatically saved and synchronized across all your devices in real time.</p>
+        <p><b>🔒 PIN Lock:</b> Protected by default with PIN <b>1234</b>. You can change your PIN anytime in <b>⚙ PIN Settings</b>.</p>
+        <div style="text-align:right; margin-top:20px;">
+          <button class="btn-dark" onclick="closeModal()">Got it</button>
+        </div>
+      `;
+      $('modal').classList.add('show');
+    }
+
+    function closeModal() {
+      $('modal').classList.remove('show');
+    }
+    $('modal').onclick = e => { if (e.target === $('modal')) closeModal(); };
+
+    function toast(msg) {
+      $('notice').textContent = msg;
+      $('notice').classList.add('show');
+      setTimeout(() => $('notice').classList.remove('show'), 2800);
+    }
+
+    // Expose all functions to window for HTML inline handlers
+    Object.assign(window, {
+      pressPin,
+      backspacePin,
+      clearPin,
+      verifyPin,
+      lockApp,
+      openPinSettings,
+      saveNewPin,
+      switchTab,
+      setWritingMode,
+      addCharacterField,
+      setRating,
+      saveReview,
+      clearForm,
+      editReview,
+      deleteReview,
+      renderShelf,
+      setStudioTheme,
+      loadReviewToStudio,
+      loadReviewToStudioById,
+      previewCurrentInStudio,
+      updateStudioPreview,
+      downloadInstagramCard,
+      shareWhatsApp,
+      addWish,
+      moveToReview,
+      deleteWish,
+      exportJSON,
+      exportCSV,
+      exportPDF,
+      importFile,
+      openGuide,
+      closeModal,
+      toast
+    });
+
+    // Startup Initialization
+    function init() {
+      checkInitialAuth();
+      $('date').value = new Date().toISOString().slice(0, 10);
+      renderStars();
+      updateCounts();
+      renderShelf();
+      renderWishlist();
+      updateStudioPreview();
+      setupFirebaseListeners();
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
+      init();
+    }
+  </script>
+</body>
+</html>
