@@ -3,39 +3,45 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Leafnote — Book Review & Reading Studio</title>
+  <title>Leafnote — Your Reading Notebook</title>
   <style>
+    /* ============================================================
+       Leafnote — calm, reliable notebook design
+       Warm paper, one deep-green accent, serif book titles.
+       ============================================================ */
     :root {
-      --ink: #162022;
-      --muted: #5e6d6b;
-      --muted-light: #849491;
-      --paper: #fffdf9;
-      --paper-card: #ffffff;
-      --lime: #d8ee75;
-      --lime2: #b9d849;
-      --coral: #ff7758;
-      --lav: #e8e2ff;
-      --lav-dark: #4b3d75;
-      --line: #e3e6de;
-      --deep: #123d39;
-      --deep-light: #1b4f4a;
-      --green-sync: #10b981;
-      --amber-sync: #f59e0b;
-      --shadow-sm: 0 2px 8px rgba(18, 61, 57, 0.04);
-      --shadow-md: 0 8px 24px rgba(18, 61, 57, 0.07);
-      --shadow-lg: 0 16px 40px rgba(18, 61, 57, 0.12);
+      --ink: #26312c;
+      --muted: #6c7873;
+      --muted-light: #9aa39c;
+      --paper: #f6f5ef;
+      --paper-card: #fffefb;
+      --accent: #175244;
+      --accent-hover: #104034;
+      --accent-soft: #e9f1ea;
+      --deep: #175244;           /* kept for inline styles */
+      --gold: #c2932c;
+      --coral: #d05a3f;
+      --line: #e6e4d9;
+      --line-strong: #d8d5c6;
+      --green-sync: #2e9e6b;
+      --amber-sync: #d9a422;
+      --shadow-sm: 0 1px 3px rgba(38, 49, 44, 0.05);
+      --shadow-md: 0 6px 20px rgba(38, 49, 44, 0.07);
+      --shadow-lg: 0 18px 44px rgba(38, 49, 44, 0.14);
       --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
-      --radius-xl: 28px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+      --serif: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     body {
-      background: #f7f7f1;
+      background: var(--paper);
       color: var(--ink);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: var(--sans);
       font-size: 15px;
       line-height: 1.5;
       min-height: 100vh;
@@ -43,63 +49,51 @@
       flex-direction: column;
     }
 
-    button, input, textarea, select {
-      font: inherit;
-    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; border: 0; transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease; }
 
-    button {
-      cursor: pointer;
-      border: 0;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    /* ============================================================
-       App Shell & Header
-       ============================================================ */
     .app {
-      max-width: 1400px;
+      max-width: 1080px;
       width: 100%;
       margin: 0 auto;
-      padding: 16px 24px 60px;
+      padding: 18px 20px 70px;
       flex: 1;
     }
 
+    /* ============================================================
+       Header
+       ============================================================ */
     .top-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
       gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
     }
 
-    .brand-wrap {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .brand-wrap { display: flex; align-items: center; gap: 12px; }
 
     .brand {
       display: flex;
       gap: 10px;
       align-items: center;
-      font-weight: 800;
-      font-size: 24px;
-      letter-spacing: -0.8px;
-      color: var(--deep);
+      font-family: var(--serif);
+      font-size: 23px;
+      letter-spacing: -0.3px;
+      color: var(--ink);
       text-decoration: none;
     }
 
     .mark {
-      height: 38px;
-      width: 38px;
-      border-radius: 12px;
-      background: var(--lime);
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
       display: grid;
       place-items: center;
-      font-size: 21px;
-      transform: rotate(-6deg);
-      box-shadow: 0 3px 10px rgba(185, 216, 73, 0.3);
+      font-size: 18px;
     }
 
     .sync-status {
@@ -109,338 +103,299 @@
       font-size: 11px;
       font-weight: 700;
       padding: 4px 10px;
-      border-radius: 20px;
-      background: #eef2e6;
-      color: #385049;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
       letter-spacing: 0.2px;
     }
 
     .sync-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: var(--green-sync);
-      box-shadow: 0 0 6px var(--green-sync);
-      animation: pulse 2s infinite;
+      animation: pulse 2.2s infinite;
     }
 
-    .sync-status.offline .sync-dot {
-      background: var(--amber-sync);
-      box-shadow: none;
-      animation: none;
-    }
+    .sync-status.offline { background: #f5eeda; color: #8a6d1f; }
+    .sync-status.offline .sync-dot { background: var(--amber-sync); animation: none; }
 
     @keyframes pulse {
-      0% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-      100% { opacity: 1; transform: scale(1); }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
     }
 
-    .header-actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .btn-outline, .btn-dark, .btn-soft, .btn-accent {
-      padding: 9px 15px;
-      border-radius: var(--radius-md);
-      font-weight: 700;
-      font-size: 13px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn-outline {
-      border: 1px solid #d2d7cd;
-      background: var(--paper-card);
-      color: var(--ink);
-    }
-    .btn-outline:hover { background: #eef1ea; }
-
-    .btn-dark {
-      color: #fff;
-      background: var(--deep);
-    }
-    .btn-dark:hover { background: var(--deep-light); transform: translateY(-1px); }
-
-    .btn-soft {
-      background: #edf1e4;
-      color: var(--deep);
-    }
-    .btn-soft:hover { background: #e2e8d6; }
-
-    .btn-accent {
-      background: var(--lime2);
-      color: #172b0b;
-    }
-    .btn-accent:hover { background: #acd03b; }
+    .header-actions { display: flex; gap: 4px; }
 
     /* ============================================================
-       Navigation Tabs (One-Click Switching)
+       Buttons
+       ============================================================ */
+    .btn-dark, .btn-accent {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      padding: 11px 20px;
+      border-radius: 11px;
+      font-size: 14px;
+      box-shadow: 0 1px 2px rgba(23, 82, 68, 0.25);
+    }
+    .btn-dark:hover, .btn-accent:hover { background: var(--accent-hover); }
+    .btn-dark.big { padding: 13px 26px; font-size: 15px; border-radius: 12px; }
+
+    .btn-soft {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 13.5px;
+    }
+    .btn-soft:hover { background: #dceade; }
+
+    .btn-outline {
+      background: #fff;
+      border: 1px solid var(--line-strong);
+      color: var(--ink);
+      font-weight: 600;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 13.5px;
+    }
+    .btn-outline:hover { border-color: var(--muted-light); background: #fbfaf5; }
+
+    .btn-quiet {
+      background: none;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 9px;
+    }
+    .btn-quiet:hover { background: #edebe0; color: var(--ink); }
+
+    /* ============================================================
+       Navigation
        ============================================================ */
     .nav-bar {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--paper-card);
-      padding: 6px;
-      border-radius: var(--radius-lg);
+      gap: 4px;
+      background: #edece3;
       border: 1px solid var(--line);
-      margin-bottom: 18px;
+      padding: 4px;
+      border-radius: 13px;
+      margin-bottom: 22px;
       overflow-x: auto;
       scrollbar-width: none;
-      box-shadow: var(--shadow-sm);
     }
     .nav-bar::-webkit-scrollbar { display: none; }
 
     .tab-btn {
-      padding: 10px 18px;
-      border-radius: var(--radius-md);
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--muted);
-      background: transparent;
+      flex: 1;
       white-space: nowrap;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-    .tab-btn:hover {
-      color: var(--ink);
-      background: #f4f6ef;
-    }
-    .tab-btn.active {
-      background: var(--deep);
-      color: #ffffff;
-      box-shadow: 0 4px 12px rgba(18, 61, 57, 0.15);
-    }
-    .tab-badge {
-      font-size: 11px;
-      padding: 2px 7px;
+      padding: 9px 14px;
       border-radius: 10px;
-      background: #e1e7db;
-      color: var(--deep);
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13.5px;
     }
-    .tab-btn.active .tab-badge {
-      background: var(--lime);
-      color: var(--deep);
-      font-weight: 800;
+    .tab-btn:hover { color: var(--ink); }
+    .tab-btn.active {
+      background: #fff;
+      color: var(--ink);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tab-badge {
+      margin-left: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 1px 7px;
+      border-radius: 999px;
     }
 
     /* ============================================================
-       Hero Banner (Compact & Refined)
+       Greeting
        ============================================================ */
-    .hero {
-      border-radius: var(--radius-lg);
-      background: var(--deep);
-      color: #fff;
-      padding: 24px 30px;
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow-md);
-    }
-    .hero:after {
-      content: "";
-      position: absolute;
-      width: 220px;
-      height: 220px;
-      border: 30px solid var(--lime);
-      border-radius: 50%;
-      right: 20px;
-      top: -100px;
-      opacity: 0.9;
-      pointer-events: none;
+    .hero { padding: 2px 2px 20px; }
+    .hero-date {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: var(--muted);
     }
     .hero h1 {
-      font-size: 25px;
-      letter-spacing: -1px;
-      margin: 0 0 4px;
-      max-width: 620px;
-      font-weight: 800;
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: 31px;
+      letter-spacing: -0.4px;
+      margin: 6px 0 4px;
+      color: var(--ink);
     }
-    .hero p {
-      margin: 0;
-      color: #d6e4df;
-      font-size: 14.5px;
-      max-width: 580px;
-    }
+    .hero p { color: var(--muted); font-size: 14.5px; }
 
     /* ============================================================
-       View Containers
+       Panels & cards
        ============================================================ */
-    .view-panel {
-      display: none;
-      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .view-panel.active {
-      display: block;
-    }
+    .view-panel { display: none; animation: fadeIn 0.22s ease; }
+    .view-panel.active { display: block; }
     @keyframes fadeIn {
-      0% { opacity: 0; transform: translateY(6px); }
-      100% { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .card {
       background: var(--paper-card);
       border: 1px solid var(--line);
-      box-shadow: var(--shadow-sm);
       border-radius: var(--radius-lg);
       padding: 24px;
+      box-shadow: var(--shadow-sm);
     }
 
     /* ============================================================
-       1. Writing View & Progressive Collapse System
+       Writer
        ============================================================ */
     .writer-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 18px;
-      flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .writer-header h2 {
+      font-family: var(--serif);
+      font-size: 21px;
+      font-weight: 600;
+      color: var(--ink);
     }
 
-    label {
-      display: block;
-      font-size: 12px;
+    .status-pill {
+      font-size: 10.5px;
       font-weight: 800;
-      letter-spacing: 0.5px;
+      letter-spacing: 1.2px;
+      color: var(--muted);
+      background: #f2f1e8;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    label, .field-label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 6px;
+      margin: 16px 0 6px;
     }
+    .writer-card label:first-of-type { margin-top: 10px; }
 
     input, textarea, select {
       width: 100%;
-      padding: 12px 14px;
-      border-radius: var(--radius-md);
-      border: 1px solid #dfe3da;
-      background: #ffffff;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: #fff;
       color: var(--ink);
-      font-size: 15px;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: #9ab834;
-      box-shadow: 0 0 0 3px rgba(216, 238, 117, 0.45);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(23, 82, 68, 0.12);
     }
+    input::placeholder, textarea::placeholder { color: #b3b8ac; }
 
-    textarea.main-writer-textarea {
-      min-height: 180px;
+    #book { font-size: 16.5px; font-weight: 600; }
+
+    .main-writer-textarea {
+      min-height: 230px;
       resize: vertical;
-      line-height: 1.6;
+      line-height: 1.75;
       font-size: 15.5px;
     }
 
-    /* Collapse Trigger Button (The Toggle System) */
-    .collapse-toggle-bar {
-      margin: 14px 0 6px;
-    }
+    /* Progressive details */
+    .collapse-toggle-bar { margin-top: 18px; }
     .collapse-toggle-btn {
       width: 100%;
-      background: #f1f5eb;
-      border: 1.5px dashed #b9cbaf;
-      border-radius: var(--radius-md);
-      padding: 12px 16px;
-      font-size: 13.5px;
-      font-weight: 700;
-      color: var(--deep);
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      text-align: left;
-      cursor: pointer;
-    }
-    .collapse-toggle-btn:hover {
-      background: #e6edd9;
-      border-color: #9cb58e;
-    }
-    .collapse-toggle-btn.expanded {
-      background: #eef2e6;
-      border-style: solid;
-      border-color: #cfd8c7;
-    }
-    .collapse-btn-left {
-      display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      background: #fbfaf4;
+      border: 1px dashed var(--line-strong);
+      color: var(--muted);
+      padding: 11px 14px;
+      border-radius: 11px;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: left;
     }
+    .collapse-toggle-btn:hover { border-color: var(--muted-light); color: var(--ink); }
+    .collapse-toggle-btn.expanded { border-style: solid; background: var(--accent-soft); color: var(--accent); }
+    .collapse-btn-left { display: flex; align-items: center; gap: 8px; }
     .collapse-indicator-badge {
       font-size: 11px;
-      background: var(--lime2);
-      color: #172b0b;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-weight: 800;
+      font-weight: 700;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--accent);
+      padding: 2px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
     }
 
-    /* Collapsible Container Animation */
     .collapsible-fields-container {
       max-height: 0;
       overflow: hidden;
       opacity: 0;
-      transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, margin 0.25s ease;
+      transition: max-height 0.35s ease, opacity 0.25s ease, margin 0.25s ease;
       margin-top: 0;
     }
     .collapsible-fields-container.show {
-      max-height: 1400px;
+      max-height: 1600px;
       opacity: 1;
       margin-top: 14px;
-      padding-bottom: 4px;
     }
 
     .expanded-inner-box {
-      background: #fbfcf9;
-      border: 1px solid #e1e6dc;
+      background: #fbfaf5;
+      border: 1px solid var(--line);
       border-radius: var(--radius-md);
       padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
     }
 
     .fields-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
+      margin-bottom: 12px;
     }
 
-    .rating-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .stars { display: flex; gap: 4px; }
+    .rating-row { display: flex; align-items: center; gap: 12px; padding: 6px 0; }
+    .stars { display: flex; gap: 2px; }
     .star {
       background: none;
-      color: #d1d8cf;
-      padding: 0;
+      color: #d9d6c8;
       font-size: 26px;
       line-height: 1;
+      padding: 2px;
     }
-    .star.on { color: #f59e0b; }
-    .rating-label { font-size: 13px; font-weight: 600; color: var(--muted); }
+    .star.on { color: var(--gold); }
+    .rating-label { font-size: 12.5px; color: var(--muted); font-weight: 600; }
 
-    /* Meet the Cast Section */
-    .characters-section {
-      background: #ffffff;
-      border: 1px dashed #d5ded2;
-      border-radius: var(--radius-md);
-      padding: 14px;
-      margin-top: 4px;
-    }
+    /* Characters */
+    .characters-section { margin-top: 4px; }
     .char-entry {
-      background: #fbfcf9;
-      border: 1px solid #e1e6db;
-      border-radius: var(--radius-md);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
       padding: 12px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       position: relative;
     }
     .char-row {
@@ -448,59 +403,56 @@
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       margin-bottom: 8px;
+      padding-right: 22px;
     }
-    .char-notes {
-      min-height: 48px;
-      resize: vertical;
-      font-size: 13.5px;
-    }
+    .char-notes { min-height: 56px; }
     .remove-char-btn {
       position: absolute;
-      top: 8px;
+      top: 9px;
       right: 10px;
-      background: transparent;
-      color: #94a39b;
-      font-size: 20px;
-      font-weight: 800;
+      background: none;
+      border: none;
+      color: var(--muted-light);
+      font-size: 19px;
+      font-weight: 700;
       line-height: 1;
-      padding: 2px 6px;
-      border-radius: 6px;
+      padding: 3px;
     }
-    .remove-char-btn:hover {
-      color: var(--coral);
-      background: #ffefea;
-    }
+    .remove-char-btn:hover { color: var(--coral); }
 
     .form-actions {
       display: flex;
-      gap: 12px;
       align-items: center;
-      margin-top: 18px;
+      gap: 10px;
       flex-wrap: wrap;
+      margin-top: 22px;
     }
+    .form-actions .push-right { margin-left: auto; }
 
     /* ============================================================
-       2. Shelf View (Library)
+       Shelf
        ============================================================ */
     .shelf-toolbar {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
+      align-items: flex-end;
+      gap: 14px;
       flex-wrap: wrap;
-      gap: 12px;
+      margin-bottom: 16px;
     }
-    .search-input {
-      max-width: 320px;
-      padding: 9px 14px;
-      border-radius: 20px;
-      font-size: 13.5px;
+    .shelf-toolbar h2 {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--ink);
     }
+
+    .search-input { max-width: 280px; }
 
     .reviews-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 16px;
+      gap: 14px;
     }
 
     .review-card {
@@ -508,500 +460,379 @@
       border: 1px solid var(--line);
       border-radius: var(--radius-lg);
       padding: 18px;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      position: relative;
-    }
-    .review-card:hover {
-      border-color: #b9d849;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
-    .review-top {
-      display: flex;
       gap: 14px;
-      align-items: flex-start;
-      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.18s ease, border-color 0.18s ease;
     }
+    .review-card:hover { box-shadow: var(--shadow-md); border-color: #cfccbd; }
+
+    .review-top { display: flex; gap: 12px; align-items: flex-start; }
+
     .book-cover {
-      width: 44px;
-      height: 56px;
-      border-radius: 8px;
-      background: linear-gradient(145deg, #e7b8af, #ff7758);
-      color: #ffffff;
+      width: 46px;
+      height: 60px;
+      border-radius: 7px;
+      background: #5b7d6f;
+      color: #fdfcf6;
       display: grid;
       place-items: center;
-      font-weight: 800;
-      font-family: Georgia, serif;
+      font-family: var(--serif);
       font-size: 22px;
       flex: none;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
-    .review-card:nth-child(3n) .book-cover { background: linear-gradient(145deg, #9ebadd, #405b86); }
-    .review-card:nth-child(3n+2) .book-cover { background: linear-gradient(145deg, #cfc077, #77631f); }
+    .review-card:nth-child(3n) .book-cover { background: #8a6d5c; }
+    .review-card:nth-child(3n + 2) .book-cover { background: #5c6d8a; }
 
-    .review-meta { flex: 1; min-width: 0; }
+    .review-meta { min-width: 0; }
     .review-title {
-      font-weight: 800;
-      font-size: 16.5px;
+      font-family: var(--serif);
+      font-size: 18.5px;
+      line-height: 1.25;
       color: var(--ink);
-      white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 2px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
     }
-    .review-author {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-    .card-stars { color: #f59e0b; font-size: 13px; }
+    .review-author { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+    .card-stars { color: var(--gold); font-size: 13px; letter-spacing: 1px; margin-top: 3px; }
 
     .review-snippet {
       font-size: 13.5px;
-      color: #384643;
-      line-height: 1.5;
-      margin-bottom: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      overflow: hidden;
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
-      overflow: hidden;
     }
 
-    .character-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 14px;
-    }
+    .character-chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .char-chip {
-      font-size: 11px;
-      font-weight: 700;
-      background: #edf2e8;
-      color: var(--deep);
-      padding: 3px 8px;
-      border-radius: 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      background: #f4f3ea;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: 11.5px;
+      color: var(--muted);
     }
 
     .card-bottom {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-top: 1px solid #edf1ea;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-top: 1px solid #f0eee4;
       padding-top: 12px;
       font-size: 12px;
-      color: var(--muted-light);
+      color: var(--muted);
     }
-    .card-actions {
-      display: flex;
-      gap: 6px;
-    }
+    .card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 
     /* ============================================================
-       3. Share Studio & Instagram Post Canvas
+       Share Studio
        ============================================================ */
     .studio-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      align-items: flex-start;
+      grid-template-columns: 1fr 1.05fr;
+      gap: 20px;
+      align-items: start;
     }
 
-    .theme-selector {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
+    .theme-selector { display: flex; gap: 8px; flex-wrap: wrap; }
     .theme-chip {
-      padding: 7px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
-      font-weight: 700;
-      border: 1px solid #d2d8ce;
-      background: var(--paper-card);
-      cursor: pointer;
+      background: #fff;
+      border: 1px solid var(--line-strong);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 7px 13px;
+      font-size: 12.5px;
+      font-weight: 600;
     }
     .theme-chip.active {
-      background: var(--deep);
-      color: #ffffff;
-      border-color: var(--deep);
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
-    /* Instagram Live Preview Card */
     .insta-card-preview {
       aspect-ratio: 1 / 1;
-      border-radius: var(--radius-lg);
-      padding: 32px;
-      color: #ffffff;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      border-radius: 18px;
+      padding: 30px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      position: relative;
+      gap: 16px;
+      box-shadow: var(--shadow-md);
       overflow: hidden;
-      box-shadow: var(--shadow-lg);
-      transition: all 0.3s ease;
     }
-    .insta-card-preview.theme-emerald {
-      background: #123d39;
-    }
-    .insta-card-preview.theme-emerald:after {
-      content: "";
-      position: absolute;
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      background: #d8ee75;
-      right: -50px;
-      top: -50px;
-      opacity: 0.95;
-      pointer-events: none;
-    }
-    .insta-card-preview.theme-parchment {
-      background: #fbf8ef;
-      color: #1a1a18;
-      border: 1px solid #dcd7c5;
-    }
-    .insta-card-preview.theme-parchment:after {
-      content: "❧";
-      position: absolute;
-      right: 20px;
-      top: 10px;
-      font-size: 140px;
-      color: #e5ded0;
-      opacity: 0.6;
-      pointer-events: none;
-    }
-    .insta-card-preview.theme-midnight {
-      background: #0d171d;
-      color: #f1f5f9;
-    }
-    .insta-card-preview.theme-midnight:after {
-      content: "";
-      position: absolute;
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #c084fc, #ff7758);
-      right: -30px;
-      top: -30px;
-      opacity: 0.8;
-      pointer-events: none;
-    }
+    .theme-emerald { background: #123d39; color: #f2f6ee; }
+    .theme-emerald .prev-badge { color: #d8ee75; }
+    .theme-parchment { background: #faf6ea; color: #2c261b; border: 1px solid #e7dfc9; }
+    .theme-parchment .prev-badge { color: #a08339; }
+    .theme-midnight { background: #111a21; color: #eef2f5; }
+    .theme-midnight .prev-badge { color: #c084fc; }
 
-    .prev-badge {
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      opacity: 0.85;
-      position: relative;
-      z-index: 2;
-    }
+    .prev-badge { font-size: 10.5px; letter-spacing: 1.8px; font-weight: 700; }
     .prev-book {
-      font-family: Georgia, serif;
-      font-size: 26px;
+      font-family: var(--serif);
       font-weight: 700;
-      line-height: 1.2;
-      margin: 10px 0 4px;
-      position: relative;
-      z-index: 2;
-      max-width: 80%;
+      font-size: 26px;
+      line-height: 1.15;
+      margin-top: 10px;
     }
-    .prev-auth {
-      font-size: 14px;
-      opacity: 0.85;
-      position: relative;
-      z-index: 2;
-    }
+    .prev-auth { font-size: 13px; opacity: 0.75; margin-top: 4px; }
     .prev-quote {
-      font-family: Georgia, serif;
+      font-family: var(--serif);
       font-style: italic;
       font-size: 15px;
       line-height: 1.5;
-      margin: 16px 0;
-      position: relative;
-      z-index: 2;
+      overflow: hidden;
       display: -webkit-box;
       -webkit-line-clamp: 4;
       -webkit-box-orient: vertical;
-      overflow: hidden;
     }
     .prev-cast-box {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(8px);
-      border-radius: 12px;
-      padding: 10px 14px;
-      margin-top: 10px;
-      position: relative;
-      z-index: 2;
-    }
-    .theme-parchment .prev-cast-box {
-      background: rgba(0, 0, 0, 0.05);
-    }
-    .prev-cast-title {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-      opacity: 0.75;
-    }
-    .prev-cast-items {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.12);
       font-size: 12px;
-      line-height: 1.4;
-      max-height: 56px;
-      overflow: hidden;
     }
-    .prev-stars {
-      color: #f59e0b;
-      font-size: 20px;
-      position: relative;
-      z-index: 2;
-      margin-top: auto;
-    }
+    .theme-parchment .prev-cast-box { background: rgba(0, 0, 0, 0.05); }
+    .prev-cast-title { font-weight: 700; margin-bottom: 4px; }
+    .prev-stars { color: #e9b23e; font-size: 20px; letter-spacing: 2px; }
 
     /* ============================================================
-       4. Want to Read / Wishlist View
+       Wishlist
        ============================================================ */
     .wishlist-add-box {
-      display: flex;
-      gap: 10px;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr auto;
+      gap: 8px;
       margin-bottom: 18px;
     }
 
     /* ============================================================
-       5. Export & Backup View
+       Export / Backup
        ============================================================ */
     .export-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
     .export-card {
-      background: #fbfcf9;
-      border: 1px solid #dfe5da;
+      background: var(--paper-card);
+      border: 1px solid var(--line);
       border-radius: var(--radius-md);
-      padding: 18px;
-      text-align: center;
+      padding: 16px;
       cursor: pointer;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
-    .export-card:hover {
-      background: #f1f6eb;
-      border-color: #b9d849;
-    }
-    .export-card h3 {
-      font-size: 16px;
-      margin-bottom: 4px;
-    }
-    .export-card p {
-      font-size: 12px;
-      color: var(--muted);
-    }
+    .export-card:hover { border-color: var(--accent); box-shadow: var(--shadow-sm); }
+    .export-card h3 { font-size: 14.5px; margin-bottom: 5px; color: var(--ink); }
+    .export-card p { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
 
     /* ============================================================
-       PIN Lock Screen Styling
+       Letter modal (elegant preview)
+       ============================================================ */
+    .modal-sub { margin-bottom: 4px; }
+
+    .letter-preview {
+      background: #fffdf6;
+      border: 1px solid #eae4d0;
+      border-radius: 10px;
+      padding: 20px 22px;
+      margin: 16px 0;
+      font-family: var(--serif);
+      color: #3a423c;
+      box-shadow: inset 0 0 30px rgba(194, 147, 44, 0.05);
+    }
+    .lp-ornament { text-align: center; color: var(--accent); font-size: 16px; }
+    .lp-wordmark { text-align: center; letter-spacing: 4px; font-size: 13px; margin-top: 2px; color: #26312c; }
+    .lp-rule { border: none; border-top: 1px solid #ddd5bd; margin: 10px 0; }
+    .lp-date { text-align: right; font-style: italic; font-size: 11px; color: #8b938a; margin-bottom: 10px; }
+    .lp-salutation { font-size: 13px; margin-bottom: 8px; }
+    .lp-body {
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: #4a524b;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+    }
+    .lp-close { margin-top: 12px; font-size: 12.5px; }
+    .lp-sign { font-style: italic; font-weight: 700; font-size: 14px; }
+
+    .letter-followup {
+      margin-top: 16px;
+      padding: 14px;
+      background: #f6f8f2;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    .followup-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .followup-actions a { text-decoration: none; display: inline-flex; align-items: center; }
+
+    /* ============================================================
+       Lock screen
        ============================================================ */
     .lock-screen {
       position: fixed;
       inset: 0;
-      background: #0e2420f2;
-      backdrop-filter: blur(18px);
+      background: var(--paper);
       z-index: 9999;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       padding: 20px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 0.25s ease;
     }
-    .lock-screen.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .lock-screen.show { opacity: 1; pointer-events: auto; }
+
     .lock-card {
       background: var(--paper-card);
-      max-width: 360px;
-      width: 100%;
+      border: 1px solid var(--line);
       border-radius: var(--radius-xl);
-      padding: 32px 26px 24px;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+      box-shadow: var(--shadow-md);
+      padding: 34px 30px;
+      width: 100%;
+      max-width: 360px;
       text-align: center;
-      animation: cardPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: cardPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     @keyframes cardPop {
-      0% { transform: scale(0.92); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .lock-icon {
-      width: 56px;
-      height: 56px;
-      background: var(--lav);
-      color: var(--lav-dark);
-      font-size: 24px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      margin: 0 auto 14px;
-    }
-    .lock-title {
-      font-size: 22px;
-      margin: 0 0 4px;
-      font-weight: 800;
-      color: var(--deep);
-    }
-    .lock-desc {
-      font-size: 13px;
-      color: var(--muted);
-      margin: 0 0 20px;
-    }
-    .pin-dots {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-    .pin-dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      border: 2px solid #b8c4b8;
-      background: transparent;
-      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .pin-dot.filled {
-      background: var(--deep);
-      border-color: var(--deep);
-      transform: scale(1.15);
-    }
-    .pin-dots.shake {
-      animation: shake 0.4s ease-in-out;
-    }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-12px); }
-      40%, 80% { transform: translateX(12px); }
-    }
-    .pin-error {
-      min-height: 18px;
-      font-size: 12.5px;
-      font-weight: 700;
-      color: #dc2626;
-      margin-bottom: 10px;
-    }
-    .pin-keypad {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      max-width: 270px;
-      margin: 0 auto 18px;
-    }
-    .key-btn {
-      height: 54px;
-      border-radius: 14px;
-      background: #f1f4ed;
-      color: var(--ink);
-      font-size: 20px;
-      font-weight: 700;
-      display: grid;
-      place-items: center;
-    }
-    .key-btn:hover { background: #e3e8dc; }
-    .key-btn:active { background: #d5dccb; }
-    .key-action { font-size: 14px; color: #6a7873; background: transparent; }
-    .key-action:hover { background: #edf2e8; }
-    .pin-hint {
-      font-size: 12px;
-      color: #798a84;
-      background: #edf2e8;
-      padding: 5px 12px;
-      border-radius: 12px;
-      display: inline-block;
+      from { transform: scale(0.94); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
 
-    /* Modal & Notice */
+    .lock-icon {
+      width: 54px;
+      height: 54px;
+      margin: 0 auto 14px;
+      border-radius: 16px;
+      background: var(--accent-soft);
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+    }
+    .lock-title { font-family: var(--serif); font-size: 22px; font-weight: 600; }
+    .lock-desc { color: var(--muted); font-size: 13.5px; margin: 6px 0 18px; }
+
+    .pin-dots { display: flex; gap: 14px; justify-content: center; margin-bottom: 6px; }
+    .pin-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 1.5px solid var(--line-strong);
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .pin-dot.filled { background: var(--accent); border-color: var(--accent); }
+    .pin-dots.shake { animation: shake 0.4s ease-in-out; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-11px); }
+      40%, 80% { transform: translateX(11px); }
+    }
+
+    .pin-error { min-height: 18px; font-size: 12.5px; font-weight: 600; color: var(--coral); }
+
+    .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-top: 14px; }
+    .key-btn {
+      padding: 13px 0;
+      font-size: 19px;
+      font-weight: 600;
+      background: #f7f6f0;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: var(--ink);
+    }
+    .key-btn:hover { background: var(--accent-soft); }
+    .key-btn:active { background: #dceade; }
+    .key-action { font-size: 13px; color: var(--muted); }
+
+    .pin-hint { margin-top: 16px; font-size: 12px; color: var(--muted); }
+
+    /* ============================================================
+       Notice & modal
+       ============================================================ */
     .notice {
       position: fixed;
       bottom: 24px;
       left: 50%;
-      transform: translate(-50%, 100px);
-      background: #192c29;
-      color: white;
+      transform: translate(-50%, 90px);
+      background: #26312c;
+      color: #fff;
       padding: 11px 18px;
-      border-radius: 10px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-      transition: .3s cubic-bezier(0.16, 1, 0.3, 1);
-      z-index: 1000;
-      font-size: 14px;
-      font-weight: 600;
-      pointer-events: none;
+      border-radius: 11px;
+      font-size: 13.5px;
+      box-shadow: var(--shadow-md);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 10000;
+      max-width: 92vw;
+      text-align: center;
     }
     .notice.show { transform: translate(-50%, 0); }
 
     .modal {
       position: fixed;
       inset: 0;
-      background: rgba(13, 34, 28, 0.6);
+      background: rgba(38, 49, 44, 0.45);
       display: none;
       place-items: center;
-      padding: 20px;
-      z-index: 500;
-      backdrop-filter: blur(4px);
+      padding: 18px;
+      z-index: 9998;
+      overflow-y: auto;
     }
     .modal.show { display: grid; }
+
     .modalbox {
-      max-width: 580px;
-      width: 100%;
-      max-height: 85vh;
-      overflow: auto;
       background: var(--paper-card);
-      border-radius: var(--radius-xl);
-      padding: 28px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+      border-radius: 18px;
+      padding: 26px;
+      width: 100%;
+      max-width: 560px;
+      max-height: 88vh;
+      overflow: auto;
+      box-shadow: var(--shadow-lg);
+      animation: cardPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .modalbox h2 { font-size: 20px; margin-bottom: 8px; color: var(--deep); }
-    .modalbox p { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 12px; }
+    .modalbox h2 { font-family: var(--serif); font-size: 21px; font-weight: 600; margin-bottom: 6px; }
+    .modalbox p { color: var(--muted); font-size: 13.5px; line-height: 1.55; }
+    .modalbox input { margin-bottom: 12px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
 
     /* ============================================================
-       Responsive Layout Adaptation (Mobile, Tablet, Desktop)
+       Responsive
        ============================================================ */
     @media (max-width: 900px) {
-      .app { padding: 14px 16px 50px; }
+      .app { padding: 14px 14px 60px; }
+      .hero h1 { font-size: 26px; }
+      .fields-grid-2 { grid-template-columns: 1fr; }
       .studio-grid { grid-template-columns: 1fr; }
-      .hero { padding: 20px 22px; }
-      .hero h1 { font-size: 22px; }
-      .hero:after { right: -90px; top: -90px; width: 180px; height: 180px; }
-      .export-grid { grid-template-columns: 1fr; }
+      .wishlist-add-box { grid-template-columns: 1fr; }
+      .shelf-toolbar { flex-direction: column; align-items: stretch; }
+      .search-input { max-width: none; }
+      .tab-btn { padding: 9px 12px; font-size: 13px; }
+      .card { padding: 18px; }
+      .insta-card-preview { padding: 22px; }
+      .prev-book { font-size: 21px; }
     }
 
-    @media (max-width: 600px) {
-      .top-header { flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 12px; }
-      .header-actions { justify-content: space-between; }
-      .nav-bar { padding: 4px; gap: 4px; margin-bottom: 14px; }
-      .tab-btn { padding: 8px 12px; font-size: 13px; }
-      .hero { padding: 16px 18px; margin-bottom: 14px; border-radius: var(--radius-md); }
-      .hero h1 { font-size: 18px; line-height: 1.25; margin-bottom: 4px; }
-      .hero p { font-size: 13px; line-height: 1.4; }
-      .hero:after { display: none; }
-      .card { padding: 16px; border-radius: var(--radius-md); }
-      .fields-grid-2 { grid-template-columns: 1fr; }
-      .char-row { grid-template-columns: 1fr; }
-      .wishlist-add-box { flex-direction: column; }
-      .form-actions { flex-direction: column; }
-      .form-actions button { width: 100%; }
-      .reviews-grid { grid-template-columns: 1fr; }
-      .insta-card-preview { padding: 22px; }
-      .prev-book { font-size: 21px; max-width: 100%; }
-      .prev-quote { font-size: 13.5px; }
-    }
   </style>
 </head>
 <body>
@@ -1063,77 +894,68 @@
       </div>
 
       <div class="header-actions">
-        <button class="btn-outline" onclick="openGuide()">💡 Guide</button>
-        <button class="btn-soft" onclick="openPinSettings()" title="Change PIN passcode">⚙ PIN Settings</button>
-        <button class="btn-outline" onclick="lockApp()" title="Lock reading journal">🔒 Lock</button>
+        <button class="btn-quiet" onclick="openGuide()" title="How Leafnote works">Guide</button>
+        <button class="btn-quiet" onclick="openPinSettings()" title="Change PIN passcode">PIN</button>
+        <button class="btn-quiet" onclick="lockApp()" title="Lock your notebook">🔒 Lock</button>
       </div>
     </header>
 
     <!-- One-Click Navigation Bar -->
     <nav class="nav-bar">
       <button class="tab-btn active" id="tab-write" onclick="switchTab('write')">
-        ✍️ Write Note
+        ✍️ Write
       </button>
       <button class="tab-btn" id="tab-shelf" onclick="switchTab('shelf')">
         📚 My Shelf <span class="tab-badge" id="shelfBadge">0</span>
       </button>
-      <button class="tab-btn" id="tab-studio" onclick="switchTab('studio')">
-        🎨 Share Studio
-      </button>
       <button class="tab-btn" id="tab-wishlist" onclick="switchTab('wishlist')">
         🔖 Want to Read <span class="tab-badge" id="wishBadge">0</span>
       </button>
+      <button class="tab-btn" id="tab-studio" onclick="switchTab('studio')">
+        🎨 Studio
+      </button>
       <button class="tab-btn" id="tab-export" onclick="switchTab('export')">
-        💾 Export & Import
+        🗂 Backup
       </button>
     </nav>
 
-    <!-- Compact Hero Greeting -->
+    <!-- Quiet greeting -->
     <section class="hero">
-      <h1>Your reading life, beautifully remembered.</h1>
-      <p>Capture instant thoughts, deep character insights, and share-ready quotes in one calm studio.</p>
+      <div class="hero-date" id="heroDate"></div>
+      <h1>What are you reading today?</h1>
+      <p>Jot your thoughts in one tap — then send any note as a beautiful letter.</p>
     </section>
 
     <!-- ============================================================
          1. Write View (Pure Minimal Writing + Collapse System)
          ============================================================ -->
     <section class="view-panel active" id="view-write">
-      <div class="card">
+      <div class="card writer-card">
         <div class="writer-header">
-          <div>
-            <h2 id="formTitle" style="font-size: 20px; font-weight: 800; color: var(--deep); margin: 0 0 2px;">Write a Note</h2>
-            <span style="font-size: 12px; font-weight: 700; color: var(--muted);" id="editPill">NEW ENTRY</span>
-          </div>
+          <h2 id="formTitle">New note</h2>
+          <span class="status-pill" id="editPill">NEW</span>
         </div>
 
-        <!-- 1. Primary Clean Writing Canvas (Only 2 Essential Fields) -->
-        <div style="display:flex; flex-direction:column; gap:12px;">
-          <div>
-            <label>Book Title or Subject *</label>
-            <input id="book" placeholder="e.g. The Midnight Library (or chapter / quote)" oninput="updateStudioPreview()">
-          </div>
+        <!-- The two essential fields — everything else stays optional -->
+        <label for="book">Book or subject</label>
+        <input id="book" placeholder="e.g. The Midnight Library" oninput="updateStudioPreview()">
 
-          <div>
-            <label>Your Thoughts & Review *</label>
-            <textarea id="text" class="main-writer-textarea" placeholder="Start typing your honest reflections, memorable quotes, emotional highlights..." oninput="updateStudioPreview()"></textarea>
-          </div>
-        </div>
+        <label for="text">Your thoughts</label>
+        <textarea id="text" class="main-writer-textarea" placeholder="Write freely — what moved you, what stayed with you, what you would tell a friend about this book…" oninput="updateStudioPreview()"></textarea>
 
-        <!-- 2. The Progressive Reveal / Collapse Trigger Button -->
+        <!-- Optional details, tucked away until you want them -->
         <div class="collapse-toggle-bar">
           <button type="button" class="collapse-toggle-btn" id="detailsToggleBtn" onclick="toggleDetailsCollapse()">
             <div class="collapse-btn-left">
               <span id="detailsToggleIcon">➕</span>
-              <span id="detailsToggleText">Add Book Details, 5★ Rating & Characters</span>
+              <span id="detailsToggleText">More details — author, rating, characters</span>
             </div>
             <span class="collapse-indicator-badge" id="detailsBadge" style="display:none;">0 details</span>
           </button>
         </div>
 
-        <!-- 3. Collapsible Container (Appears ONLY when user clicks the button!) -->
         <div class="collapsible-fields-container" id="collapsibleDetails">
           <div class="expanded-inner-box">
-            <!-- Author & Rating -->
             <div class="fields-grid-2">
               <div>
                 <label>Author</label>
@@ -1141,14 +963,13 @@
               </div>
               <div>
                 <label>Your Rating</label>
-                <div class="rating-row" style="padding-top: 4px;">
+                <div class="rating-row">
                   <div class="stars" id="stars"></div>
                   <span class="rating-label" id="ratingLabel">5 / 5</span>
                 </div>
               </div>
             </div>
 
-            <!-- Date & Reference No -->
             <div class="fields-grid-2">
               <div>
                 <label>Reference No.</label>
@@ -1160,25 +981,25 @@
               </div>
             </div>
 
-            <!-- Meet the Cast / Characters Section -->
             <div class="characters-section">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;">
                 <div>
-                  <label style="margin:0; font-size: 12px; color: var(--deep);">🎭 Meet the Cast (Characters)</label>
-                  <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Included automatically on Instagram cards & WhatsApp shares.</p>
+                  <label style="margin:0;">🎭 Characters</label>
+                  <p style="font-size:12px; color:var(--muted); margin-top:2px;">People from the story worth remembering. They appear on letters and shares.</p>
                 </div>
-                <button type="button" class="btn-soft" style="padding: 5px 10px; font-size: 12px;" onclick="addCharacterField()">+ Add Character</button>
+                <button type="button" class="btn-soft" style="padding:6px 12px; font-size:12.5px;" onclick="addCharacterField()">+ Add Character</button>
               </div>
               <div id="characterList"></div>
             </div>
           </div>
         </div>
 
-        <!-- Actions -->
+        <!-- One-tap actions -->
         <div class="form-actions">
-          <button class="btn-accent" style="padding: 11px 22px; font-size: 14px;" onclick="saveReview()">💾 Save Entry</button>
-          <button class="btn-outline" onclick="clearForm()">Clear form</button>
-          <button class="btn-soft" onclick="previewCurrentInStudio()">🎨 Preview in Studio</button>
+          <button class="btn-dark big" onclick="saveReview()">💾 Save note</button>
+          <button class="btn-soft" onclick="openLetterModal('')" title="Turn this note into an elegant letter PDF and send it to anyone">✉️ Send as Letter</button>
+          <button class="btn-quiet" onclick="clearForm()">Clear</button>
+          <button class="btn-quiet push-right" onclick="previewCurrentInStudio()">Studio preview →</button>
         </div>
       </div>
     </section>
@@ -1189,10 +1010,10 @@
     <section class="view-panel" id="view-shelf">
       <div class="shelf-toolbar">
         <div>
-          <h2 style="font-size: 21px; font-weight: 800; color: var(--deep); margin: 0;">My Shelf</h2>
+          <h2>My Shelf</h2>
           <span style="font-size: 13px; color: var(--muted);" id="shelfSubcount">0 books recorded</span>
         </div>
-        <input type="text" class="search-input" id="shelfSearch" placeholder="🔍 Search title, author, cast..." oninput="renderShelf()">
+        <input type="text" class="search-input" id="shelfSearch" placeholder="Search title, author, cast…" oninput="renderShelf()">
       </div>
 
       <div class="reviews-grid" id="reviewsGrid"></div>
@@ -1205,9 +1026,9 @@
       <div class="studio-grid">
         <!-- Controls -->
         <div class="card">
-          <h2 style="font-size: 20px; font-weight: 800; color: var(--deep); margin-bottom: 4px;">Share Studio</h2>
+          <h2 style="font-family: var(--serif); font-size: 21px; font-weight: 600; margin-bottom: 4px;">Share Studio</h2>
           <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">
-            Turn any review and its character cast into high-resolution Instagram posts or WhatsApp status updates.
+            Choose a note, then send it out into the world — as an elegant letter, an Instagram card, or a WhatsApp message.
           </p>
 
           <label>Select Review to Share</label>
@@ -1223,10 +1044,13 @@
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
-            <button class="btn-accent" style="width:100%; justify-content:center; padding: 12px;" onclick="downloadInstagramCard()">
-              📸 Download Instagram Post (1080x1080)
+            <button class="btn-dark" style="width:100%; padding: 12px;" onclick="openLetterModal(document.getElementById('studioReviewSelect').value)">
+              ✉️ Elegant Letter PDF — send to anyone
             </button>
-            <button class="btn-soft" style="width:100%; justify-content:center; padding: 12px; background: #dcf5df; color: #1e753b;" onclick="shareWhatsApp()">
+            <button class="btn-outline" style="width:100%; padding: 12px;" onclick="downloadInstagramCard()">
+              📸 Download Instagram Post (1080×1080)
+            </button>
+            <button class="btn-soft" style="width:100%; padding: 12px; background: #dcf5df; color: #1e753b;" onclick="shareWhatsApp()">
               ✆ Share to WhatsApp Status / Chat
             </button>
           </div>
@@ -1262,8 +1086,8 @@
          ============================================================ -->
     <section class="view-panel" id="view-wishlist">
       <div class="card" style="max-width: 800px; margin: 0 auto;">
-        <h2 style="font-size: 20px; font-weight: 800; color: var(--deep); margin-bottom: 4px;">Want to Read</h2>
-        <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">Keep a quiet list of upcoming books waiting on your reading horizon.</p>
+        <h2 style="font-family: var(--serif); font-size: 21px; font-weight: 600; margin-bottom: 4px;">Want to Read</h2>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">A quiet list of books waiting on your reading horizon.</p>
 
         <div class="wishlist-add-box">
           <input id="wishBook" placeholder="Book title (e.g. Tomorrow, and Tomorrow, and Tomorrow)">
@@ -1280,21 +1104,25 @@
          ============================================================ -->
     <section class="view-panel" id="view-export">
       <div class="card" style="max-width: 800px; margin: 0 auto;">
-        <h2 style="font-size: 20px; font-weight: 800; color: var(--deep); margin-bottom: 4px;">Bring Your Library With You</h2>
-        <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">Download complete backups in standard open formats or print archival PDF sheets.</p>
+        <h2 style="font-family: var(--serif); font-size: 21px; font-weight: 600; margin-bottom: 4px;">Bring Your Library With You</h2>
+        <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">Download complete backups in open formats, or turn a note into a letter.</p>
 
         <div class="export-grid">
+          <div class="export-card" onclick="openLetterModal('')">
+            <h3>✉️ Elegant Letter PDF</h3>
+            <p>Turn the current note into a beautiful one-page letter and send it to anyone.</p>
+          </div>
           <div class="export-card" onclick="exportJSON()">
             <h3>📄 JSON Archive</h3>
-            <p>Full structured raw backup including cast, timestamps, and reviews.</p>
+            <p>Full structured backup including cast, timestamps, and reviews.</p>
           </div>
           <div class="export-card" onclick="exportCSV()">
             <h3>📊 CSV Spreadsheet</h3>
             <p>Ready for Excel, Google Sheets, or Notion database import.</p>
           </div>
           <div class="export-card" onclick="exportPDF()">
-            <h3>🖨️ PDF Printable Note</h3>
-            <p>Single-page elegant review sheet formatted for print/PDF.</p>
+            <h3>🖨️ Printable Sheet</h3>
+            <p>Single-page review sheet formatted for print/PDF.</p>
           </div>
         </div>
 
@@ -1314,6 +1142,9 @@
   <div id="modal" class="modal">
     <div class="modalbox" id="modalbox"></div>
   </div>
+
+  <!-- Elegant Letter PDF engine (jsPDF) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <!-- ============================================================
        Application Script with Firebase Realtime Database Modular SDK
@@ -1556,12 +1387,12 @@
         container.classList.add('show');
         btn.classList.add('expanded');
         icon.textContent = '➖';
-        text.textContent = 'Hide Extra Details (Author, 5★ Rating, Cast)';
+        text.textContent = 'Hide details (author, rating, characters)';
       } else {
         container.classList.remove('show');
         btn.classList.remove('expanded');
         icon.textContent = '➕';
-        text.textContent = 'Add Book Details, 5★ Rating & Characters';
+        text.textContent = 'More details — author, rating, characters';
       }
       updateDetailsBadge();
     }
@@ -1779,8 +1610,8 @@
       ['book', 'author', 'ref', 'text'].forEach(id => { if ($(id)) $(id).value = ''; });
       $('date').value = new Date().toISOString().slice(0, 10);
       $('characterList').innerHTML = '';
-      $('formTitle').textContent = 'Write a Note';
-      $('editPill').textContent = 'NEW ENTRY';
+      $('formTitle').textContent = 'New note';
+      $('editPill').textContent = 'NEW';
       renderStars();
       toggleDetailsCollapse(false);
       updateStudioPreview();
@@ -1801,7 +1632,7 @@
       (r.characters || []).forEach(c => addCharacterField(c));
 
       rating = r.rating || 5;
-      $('formTitle').textContent = 'Edit Review';
+      $('formTitle').textContent = 'Edit note';
       $('editPill').textContent = 'EDITING';
 
       // Auto-expand if existing review has extra details
@@ -1884,11 +1715,11 @@
             </div>
 
             <div class="card-bottom">
-              <span>📅 ${esc(r.date || '')}</span>
+              <span>${esc(r.date || '')}</span>
               <div class="card-actions">
-                <button class="btn-soft" style="padding: 4px 10px; font-size: 12px;" onclick="loadReviewToStudioById('${r.id}')">🎨 Studio</button>
-                <button class="btn-outline" style="padding: 4px 10px; font-size: 12px;" onclick="editReview('${r.id}')">✏️ Edit</button>
-                <button class="btn-outline" style="padding: 4px 8px; font-size: 12px; color: var(--coral);" onclick="deleteReview('${r.id}')" title="Delete">🗑️</button>
+                <button class="btn-soft" style="padding: 5px 11px; font-size: 12.5px;" onclick="openLetterModal('${r.id}')" title="Send this note as an elegant letter PDF">✉️ Letter</button>
+                <button class="btn-outline" style="padding: 5px 11px; font-size: 12.5px;" onclick="editReview('${r.id}')">✏️ Edit</button>
+                <button class="btn-outline" style="padding: 5px 9px; font-size: 12.5px; color: var(--coral);" onclick="deleteReview('${r.id}')" title="Delete">🗑</button>
               </div>
             </div>
           </div>
@@ -2358,11 +2189,11 @@
     function openGuide() {
       $('modalbox').innerHTML = `
         <h2>🌿 How Leafnote Works</h2>
-        <p><b>✍️ Minimal Writing:</b> Type your book title and review immediately. When you want extra details, tap <b>➕ Add Book Details, Rating & Characters</b>.</p>
-        <p><b>🎭 Character Cast:</b> Add character names, roles, and insights. They automatically appear on your generated Instagram post cards and WhatsApp shares.</p>
-        <p><b>⚡ Firebase Realtime Sync:</b> Every entry, wishlist item, and edit is automatically saved and synchronized across all your devices in real time.</p>
-        <p><b>🔒 PIN Lock:</b> Protected by default with PIN <b>1234</b>. You can change your PIN anytime in <b>⚙ PIN Settings</b>.</p>
-        <div style="text-align:right; margin-top:20px;">
+        <p><b>✍️ One-tap notes:</b> Type the book title and your thoughts, then tap <b>Save note</b>. Author, rating and characters are optional — tap <b>More details</b> whenever you want them.</p>
+        <p><b>✉️ Send as a letter:</b> Tap <b>Letter</b> on any note to turn it into an elegant one-page PDF letter — then share it to WhatsApp, email or any app, or simply download it.</p>
+        <p><b>⚡ Cloud sync:</b> Every note, wishlist item and edit is saved and synchronized across your devices in real time.</p>
+        <p><b>🔒 PIN lock:</b> Protected by default with PIN <b>1234</b>. Change it anytime under <b>PIN</b> in the top bar.</p>
+        <div class="modal-actions">
           <button class="btn-dark" onclick="closeModal()">Got it</button>
         </div>
       `;
@@ -2378,6 +2209,416 @@
       $('notice').textContent = msg;
       $('notice').classList.add('show');
       setTimeout(() => $('notice').classList.remove('show'), 2800);
+    }
+
+    // ============================================================
+    // Elegant Letter PDF — turn any note into a beautiful letter
+    // and send it to anyone (share sheet / WhatsApp / email).
+    // ============================================================
+    let letterTarget = null;
+
+    function todayLong() {
+      try {
+        return new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+      } catch (e) {
+        return new Date().toISOString().slice(0, 10);
+      }
+    }
+
+    function niceDate(iso) {
+      if (!iso) return '';
+      try {
+        const d = new Date(String(iso).slice(0, 10) + 'T00:00:00');
+        return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+      } catch (e) {
+        return String(iso);
+      }
+    }
+
+    // jsPDF standard fonts speak WinAnsi/Latin-1 — keep only what they can print.
+    function letterSafe(s) {
+      return String(s ?? '')
+        .replace(/\u00a0/g, ' ')
+        .replace(/\r/g, '')
+        .replace(/[^\u0020-\u007e\u00a1-\u00ff\u0152\u0153\u0160\u0161\u0178\u017d\u017e\u02c6\u02dc\u2013\u2014\u2018\u2019\u201a\u201c\u201d\u201e\u2020\u2021\u2022\u2026\u2030\u2039\u203a\u20ac]/g, '')
+        .trim();
+    }
+
+    function letterFileName(r) {
+      const slug = (r.book || 'book').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'book';
+      return `leafnote-letter-${slug}.pdf`;
+    }
+
+    // Small leaf ornament drawn with two bezier curves.
+    function pdfLeaf(doc, x, y, s, rgb) {
+      doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+      doc.setDrawColor(rgb[0], rgb[1], rgb[2]);
+      doc.setLineWidth(0.2);
+      doc.lines([
+        [ s * 0.85, -s * 0.5,  s * 0.85, -s * 1.4, 0, -s * 1.9],
+        [-s * 0.85,  s * 0.5, -s * 0.85,  s * 1.4, 0,  s * 1.9]
+      ], x, y, [1, 1], 'FD', true);
+      doc.setDrawColor(255, 253, 247);
+      doc.setLineWidth(0.25);
+      doc.line(x, y - s * 0.3, x, y - s * 1.55);
+    }
+
+    // Five-pointed star drawn as a vector polygon (font-safe).
+    function pdfStar(doc, cx, cy, rOuter, filled) {
+      const pts = [];
+      for (let i = 0; i < 10; i++) {
+        const rad = (i % 2 === 0) ? rOuter : rOuter * 0.46;
+        const a = -Math.PI / 2 + (i * Math.PI) / 5;
+        pts.push([cx + rad * Math.cos(a), cy + rad * Math.sin(a)]);
+      }
+      const segs = [];
+      for (let i = 1; i < pts.length; i++) {
+        segs.push([pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]]);
+      }
+      if (filled) {
+        doc.setFillColor(194, 147, 44);
+        doc.setDrawColor(194, 147, 44);
+      } else {
+        doc.setDrawColor(212, 208, 192);
+      }
+      doc.setLineWidth(0.3);
+      doc.lines(segs, pts[0][0], pts[0][1], [1, 1], filled ? 'FD' : 'S', true);
+    }
+
+    function buildLetterPdf(r, to, from) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+
+      const W = 210, H = 297, ML = 26, CW = 158, XR = ML + CW;
+      const INK = [38, 49, 44];
+      const SOFT = [118, 128, 122];
+      const GREEN = [23, 82, 68];
+      const GOLD = [194, 147, 44];
+      const FAINT = [214, 210, 194];
+      let y = 34;
+
+      const currentPage = () => doc.internal.pages.length - 1;
+
+      function newPageIfNeeded(h) {
+        if (y + h > 267) { doc.addPage(); y = 30; }
+      }
+
+      function writeLines(text, opts = {}) {
+        const x = opts.x ?? ML;
+        const maxWidth = opts.maxWidth ?? CW;
+        const size = opts.size || 12;
+        const lh = opts.lineHeight || size * 0.55;
+        doc.setFont('times', opts.style || 'normal');
+        doc.setFontSize(size);
+        const lines = doc.splitTextToSize(text, maxWidth);
+        for (const ln of lines) {
+          newPageIfNeeded(lh);
+          doc.setTextColor(opts.color ? opts.color[0] : INK[0], opts.color ? opts.color[1] : INK[1], opts.color ? opts.color[2] : INK[2]);
+          doc.text(ln, x, y);
+          y += lh;
+        }
+      }
+
+      // ---------- Letterhead ----------
+      pdfLeaf(doc, W / 2, y + 5, 3.4, GREEN);
+      doc.setTextColor(INK[0], INK[1], INK[2]);
+      doc.setFont('times', 'normal');
+      doc.setFontSize(21);
+      doc.setCharSpace(2.8);
+      doc.text('LEAFNOTE', W / 2, y + 17, { align: 'center' });
+      doc.setFontSize(7.5);
+      doc.setCharSpace(2.2);
+      doc.setTextColor(SOFT[0], SOFT[1], SOFT[2]);
+      doc.text('A READING JOURNAL', W / 2, y + 23, { align: 'center' });
+      doc.setCharSpace(0);
+
+      doc.setDrawColor(INK[0], INK[1], INK[2]);
+      doc.setLineWidth(0.45);
+      doc.line(ML, y + 28, XR, y + 28);
+      doc.setDrawColor(GOLD[0], GOLD[1], GOLD[2]);
+      doc.setLineWidth(0.2);
+      doc.line(ML, y + 29.8, XR, y + 29.8);
+      y += 41;
+
+      // ---------- Date & salutation ----------
+      doc.setFont('times', 'italic');
+      doc.setFontSize(11);
+      doc.setTextColor(SOFT[0], SOFT[1], SOFT[2]);
+      doc.text(letterSafe(todayLong()), XR, y, { align: 'right' });
+      y += 13;
+
+      doc.setFont('times', 'normal');
+      doc.setFontSize(12.5);
+      doc.setTextColor(INK[0], INK[1], INK[2]);
+      doc.text(`Dear ${letterSafe(to) || 'friend'},`, ML, y);
+      y += 9;
+
+      // ---------- Opening line ----------
+      const bookName = letterSafe(r.book);
+      const intro = `I have just finished reading \u201c${bookName}\u201d${r.author ? ` by ${letterSafe(r.author)}` : ''}, and it stayed with me \u2014 so I wanted to write my thoughts down for you while they are still fresh.`;
+      writeLines(intro, { size: 12, lineHeight: 6.4 });
+      y += 2;
+
+      // ---------- The review itself, beside a quiet gold rule ----------
+      const paragraphs = String(r.text || '')
+        .split(/\n+/)
+        .map(p => letterSafe(p.replace(/\s+/g, ' ')))
+        .filter(Boolean);
+
+      const drawGoldRule = (y1, y2) => {
+        doc.setDrawColor(GOLD[0], GOLD[1], GOLD[2]);
+        doc.setLineWidth(0.3);
+        doc.line(ML + 3.5, y1, ML + 3.5, Math.max(y2, y1 + 2));
+      };
+
+      for (const para of paragraphs) {
+        const lh = 6.4;
+        doc.setFont('times', 'italic');
+        doc.setFontSize(12);
+        doc.setTextColor(INK[0], INK[1], INK[2]);
+        const lines = doc.splitTextToSize(para, CW - 9);
+        let segStart = y - 1;
+        for (const ln of lines) {
+          if (y + lh > 267) {
+            drawGoldRule(segStart, y - lh + 2.5);
+            doc.addPage();
+            y = 30;
+            segStart = y - 1;
+            doc.setFont('times', 'italic');
+            doc.setFontSize(12);
+            doc.setTextColor(INK[0], INK[1], INK[2]);
+          }
+          doc.text(ln, ML + 9, y);
+          y += lh;
+        }
+        drawGoldRule(segStart, y - 2.5);
+        y += 2.2;
+      }
+      y += 1;
+
+      // ---------- Rating ----------
+      if (r.rating) {
+        newPageIfNeeded(16);
+        y += 4;
+        const labels = ['', 'not for me', 'an okay read', 'a good read', 'loved it', 'a masterpiece'];
+        doc.setFont('times', 'italic');
+        doc.setFontSize(11);
+        doc.setTextColor(SOFT[0], SOFT[1], SOFT[2]);
+        const label = `My rating for this one \u2014 ${labels[r.rating] || 'loved it'}:`;
+        doc.text(label, ML, y);
+        const lw = doc.getTextWidth(label);
+        for (let i = 0; i < 5; i++) {
+          pdfStar(doc, ML + lw + 7 + i * 6.6, y - 1.4, 2.3, i < r.rating);
+        }
+        y += 8;
+      }
+
+      // ---------- Characters worth meeting ----------
+      const chars = (r.characters || []).filter(c => c && c.name);
+      if (chars.length) {
+        newPageIfNeeded(24);
+        y += 4;
+        doc.setFont('times', 'normal');
+        doc.setFontSize(8.5);
+        doc.setCharSpace(1.6);
+        doc.setTextColor(GREEN[0], GREEN[1], GREEN[2]);
+        doc.text('A FEW CHARACTERS WORTH MEETING', ML, y);
+        doc.setCharSpace(0);
+        y += 6;
+        for (const c of chars) {
+          writeLines(`\u2014 ${letterSafe(c.name)}${c.role ? ` (${letterSafe(c.role)})` : ''}`, { style: 'bold', size: 11.5, lineHeight: 6 });
+          if (c.notes) {
+            writeLines(letterSafe(c.notes), { x: ML + 7, maxWidth: CW - 7, style: 'italic', size: 10.5, color: SOFT, lineHeight: 5.6 });
+          }
+          y += 1.2;
+        }
+        y += 1;
+      }
+
+      // ---------- Closing & signature ----------
+      newPageIfNeeded(38);
+      y += 8;
+      doc.setFont('times', 'normal');
+      doc.setFontSize(12.5);
+      doc.setTextColor(INK[0], INK[1], INK[2]);
+      doc.text('Warm regards,', ML, y);
+      y += 10;
+
+      const signer = letterSafe(from) || 'Your reading friend';
+      doc.setFont('times', 'bolditalic');
+      doc.setFontSize(15);
+      doc.text(signer, ML, y);
+      const sw = Math.min(doc.getTextWidth(signer) + 8, 70);
+      doc.setDrawColor(GOLD[0], GOLD[1], GOLD[2]);
+      doc.setLineWidth(0.35);
+      doc.lines([[sw * 0.35, 1.1, sw * 0.7, -1.3, sw, -0.3]], ML + 0.5, y + 2.4, [1, 1], 'S', false);
+
+      // ---------- Footer ----------
+      if (y > 258) { doc.addPage(); y = 30; }
+      const fy = H - 20;
+      doc.setDrawColor(FAINT[0], FAINT[1], FAINT[2]);
+      doc.setLineWidth(0.2);
+      doc.line(ML, fy - 6, XR, fy - 6);
+      doc.setFont('times', 'normal');
+      doc.setFontSize(7.5);
+      doc.setCharSpace(0.6);
+      doc.setTextColor(SOFT[0], SOFT[1], SOFT[2]);
+      const footerBits = ['LEAFNOTE'];
+      if (r.ref) footerBits.push(`REF ${letterSafe(r.ref).toUpperCase()}`);
+      const fin = niceDate(r.date);
+      if (fin) footerBits.push(`FINISHED ${letterSafe(fin).toUpperCase()}`);
+      doc.text(footerBits.join('   \u00b7   '), W / 2, fy, { align: 'center' });
+      doc.setCharSpace(0);
+
+      doc.setProperties({
+        title: `A letter about "${r.book}"`,
+        subject: 'Book review letter',
+        author: from,
+        creator: 'Leafnote'
+      });
+
+      return doc.output('blob');
+    }
+
+    function openLetterModal(id) {
+      const r = id ? reviews.find(x => x.id === id) : currentFormReview();
+      if (!r || !r.text || !r.book || r.book === 'Untitled Book') {
+        toast('Write a note first \u2014 then send it as a letter.');
+        return;
+      }
+      letterTarget = r;
+      const savedTo = localStorage.getItem('leafnote_last_recipient') || '';
+      const savedFrom = localStorage.getItem('leafnote_sender_name') || '';
+
+      $('modalbox').innerHTML = `
+        <h2>\u2709\ufe0f Send as an elegant letter</h2>
+        <p class="modal-sub">Your note on <b>\u201c${esc(r.book)}\u201d</b> becomes a beautiful one-page PDF letter, ready to send to anyone.</p>
+        <div class="letter-preview" id="letterPreview"></div>
+        <div class="fields-grid-2" style="margin-bottom:0;">
+          <div>
+            <label for="letterTo">To \u2014 who is it for?</label>
+            <input id="letterTo" value="${esc(savedTo)}" placeholder="e.g. Priya, Mom, my book club" oninput="updateLetterPreview()">
+          </div>
+          <div>
+            <label for="letterFrom">From \u2014 your name</label>
+            <input id="letterFrom" value="${esc(savedFrom)}" placeholder="Your name" oninput="updateLetterPreview()">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-quiet" onclick="closeModal()">Cancel</button>
+          <button class="btn-outline" onclick="downloadLetterPdfOnly()">\u2b07 Download PDF</button>
+          <button class="btn-dark" onclick="makeLetterPdf()">Make PDF & send</button>
+        </div>
+        <div id="letterFollowUp"></div>
+      `;
+      $('modal').classList.add('show');
+      updateLetterPreview();
+      setTimeout(() => {
+        const t = $('letterTo');
+        if (t && !t.value) t.focus();
+      }, 80);
+    }
+
+    function updateLetterPreview() {
+      const box = $('letterPreview');
+      if (!box || !letterTarget) return;
+      const to = ($('letterTo') && $('letterTo').value.trim()) || 'friend';
+      const from = ($('letterFrom') && $('letterFrom').value.trim()) || 'me';
+      const flat = (letterTarget.text || '').trim().replace(/\s+/g, ' ');
+      const cut = flat.length > 150 ? flat.slice(0, 150).trimEnd() + '\u2026' : flat;
+      box.innerHTML = `
+        <div class="lp-ornament">\u2767</div>
+        <div class="lp-wordmark">LEAFNOTE</div>
+        <hr class="lp-rule">
+        <div class="lp-date">${esc(todayLong())}</div>
+        <div class="lp-salutation">Dear ${esc(to)},</div>
+        <div class="lp-body">I have just finished reading \u201c${esc(letterTarget.book)}\u201d${letterTarget.author ? ' by ' + esc(letterTarget.author) : ''}, and it stayed with me \u2014 so I wanted to write my thoughts down for you\u2026 ${esc(cut)}</div>
+        <div class="lp-close">Warm regards,<br><span class="lp-sign">${esc(from)}</span></div>
+      `;
+    }
+
+    async function makeLetterPdf() {
+      if (!letterTarget) return;
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        toast('The PDF engine could not load \u2014 please check your connection.');
+        return;
+      }
+      const to = $('letterTo').value.trim() || 'friend';
+      const from = $('letterFrom').value.trim() || 'Your reading friend';
+      localStorage.setItem('leafnote_last_recipient', $('letterTo').value.trim());
+      localStorage.setItem('leafnote_sender_name', from);
+
+      let blob;
+      try {
+        blob = buildLetterPdf(letterTarget, to, from);
+      } catch (err) {
+        console.error('Letter PDF build failed:', err);
+        toast('Sorry, the letter could not be built.');
+        return;
+      }
+
+      const name = letterFileName(letterTarget);
+      const file = new File([blob], name, { type: 'application/pdf' });
+
+      // One tap: hand the PDF straight to the system share sheet.
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: `A letter about \u201c${letterTarget.book}\u201d`,
+            text: `A little letter about \u201c${letterTarget.book}\u201d, from ${from}.`
+          });
+          toast('Letter handed to your share sheet.');
+          closeModal();
+          return;
+        } catch (err) {
+          if (err && err.name === 'AbortError') return;
+          console.warn('Share sheet failed, falling back to download.', err);
+        }
+      }
+
+      downloadBlob(name, blob, 'application/pdf');
+      showLetterFollowUp(letterTarget);
+    }
+
+    function downloadLetterPdfOnly() {
+      if (!letterTarget) return;
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        toast('The PDF engine could not load \u2014 please check your connection.');
+        return;
+      }
+      const to = $('letterTo').value.trim() || 'friend';
+      const from = $('letterFrom').value.trim() || 'Your reading friend';
+      localStorage.setItem('leafnote_last_recipient', $('letterTo').value.trim());
+      localStorage.setItem('leafnote_sender_name', from);
+
+      let blob;
+      try {
+        blob = buildLetterPdf(letterTarget, to, from);
+      } catch (err) {
+        console.error('Letter PDF build failed:', err);
+        toast('Sorry, the letter could not be built.');
+        return;
+      }
+      downloadBlob(letterFileName(letterTarget), blob, 'application/pdf');
+      toast('Letter PDF downloaded.');
+      showLetterFollowUp(letterTarget);
+    }
+
+    function showLetterFollowUp(r) {
+      const box = $('letterFollowUp');
+      if (!box) return;
+      const msg = `I have written you a little letter about \u201c${r.book}\u201d \u2014 the PDF is attached.`;
+      box.innerHTML = `
+        <div class="letter-followup">
+          <p><b>Your letter PDF has been downloaded.</b><br>Attach that file in any app to send it, or start from here:</p>
+          <div class="followup-actions">
+            <a class="btn-soft" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">\u2706 WhatsApp</a>
+            <a class="btn-outline" href="mailto:?subject=${encodeURIComponent(`A letter about \u201c${r.book}\u201d`)}&body=${encodeURIComponent(msg + '\n\n(Attach the Leafnote letter PDF that was just downloaded.)')}">\u2709 Email</a>
+            <button class="btn-quiet" onclick="makeLetterPdf()">Try share sheet again</button>
+          </div>
+        </div>
+      `;
     }
 
     // Expose all functions to window for HTML inline handlers
@@ -2415,12 +2656,19 @@
       importFile,
       openGuide,
       closeModal,
-      toast
+      toast,
+      openLetterModal,
+      updateLetterPreview,
+      makeLetterPdf,
+      downloadLetterPdfOnly
     });
 
     // Startup Initialization
     function init() {
       checkInitialAuth();
+      try {
+        $('heroDate').textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      } catch (e) {}
       $('date').value = new Date().toISOString().slice(0, 10);
       renderStars();
       updateCounts();
