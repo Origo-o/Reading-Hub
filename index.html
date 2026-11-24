@@ -766,6 +766,21 @@
     .key-action { font-size: 13px; color: var(--muted); }
 
     .pin-hint { margin-top: 16px; font-size: 12px; color: var(--muted); }
+    .pin-links { margin-top: 18px; font-size: 12.5px; }
+    .pin-links a { color: var(--muted); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+    .recovery-key-box {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      background: var(--accent-soft);
+      border: 1.5px dashed var(--accent);
+      border-radius: 12px;
+      padding: 14px 12px;
+      margin: 16px 0;
+      user-select: all;
+      word-break: break-all;
+    }
 
     /* ============================================================
        Notice & modal
@@ -782,7 +797,7 @@
       font-size: 13.5px;
       box-shadow: var(--shadow-md);
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      z-index: 10000;
+      z-index: 10020;
       max-width: 92vw;
       text-align: center;
     }
@@ -795,7 +810,7 @@
       display: none;
       place-items: center;
       padding: 18px;
-      z-index: 9998;
+      z-index: 10010;
       overflow-y: auto;
     }
     .modal.show { display: grid; }
@@ -870,8 +885,8 @@
         <button type="button" class="key-btn key-action" onclick="backspacePin()" title="Backspace">⌫</button>
       </div>
 
-      <div class="pin-hint">
-        Default PIN: <strong>1234</strong>
+      <div class="pin-links">
+        <a onclick="openRecovery()">🔑 Forgot PIN?</a>
       </div>
     </div>
   </div>
@@ -1189,14 +1204,72 @@
     let isDetailsExpanded = false;
     let studioTheme = 'emerald';
     let currentPinInput = '';
-
-    const DEFAULT_PIN = '1234';
+    let pinVerifying = false;
+    let lockoutTimer = null;
 
     const $ = id => document.getElementById(id);
     const esc = s => String(s || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
 
-    function getSavedPin() {
-      return localStorage.getItem('leafnote_pin') || DEFAULT_PIN;
+    // ============================================================
+    // PIN Crypto Core — PBKDF2-SHA256 (Web Crypto API).
+    // No PIN is ever stored or shipped in plain text: the factory
+    // PIN exists only as this salted hash, and user-chosen PINs are
+    // hashed into localStorage at save time.
+    // ============================================================
+    const PBKDF2_ITERATIONS = 250000;
+    const DEFAULT_PIN_SALT = '87ef1b63321409f23bd768a82e2bcbd1';
+    const DEFAULT_PIN_HASH = '09d5da8d7e6c89e4191713a53bc3683e80fac7e21c9c1542ac1ef5f54d2825c7';
+
+    const enc = new TextEncoder();
+
+    function bufToHex(buf) {
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    function hexToBuf(hex) {
+      const out = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.substr(i * 2, 2), 16);
+      return out;
+    }
+    function randomHex(bytes) {
+      const b = new Uint8Array(bytes);
+      crypto.getRandomValues(b);
+      return bufToHex(b);
+    }
+    async function pbkdf2(secret, saltHex) {
+      if (!window.crypto || !crypto.subtle) throw new Error('Web Crypto unavailable');
+      const key = await crypto.subtle.importKey('raw', enc.encode(secret), 'PBKDF2', false, ['deriveBits']);
+      const bits = await crypto.subtle.deriveBits(
+        { name: 'PBKDF2', hash: 'SHA-256', salt: hexToBuf(saltHex), iterations: PBKDF2_ITERATIONS },
+        key,
+        256
+      );
+      return bufToHex(bits);
+    }
+    function readSecretRecord(key) {
+      try {
+        const rec = JSON.parse(localStorage.getItem(key) || 'null');
+        if (rec && typeof rec.s === 'string' && typeof rec.h === 'string') return rec;
+      } catch (e) {}
+      return null;
+    }
+    async function writeSecretRecord(key, secret) {
+      const salt = randomHex(16);
+      const h = await pbkdf2(secret, salt);
+      localStorage.setItem(key, JSON.stringify({ s: salt, h }));
+    }
+    async function verifySecretRecord(key, secret, fallbackSalt, fallbackHash) {
+      const rec = readSecretRecord(key);
+      const salt = rec ? rec.s : fallbackSalt;
+      const target = rec ? rec.h : fallbackHash;
+      if (!salt || !target) return false;
+      const h = await pbkdf2(secret, salt);
+      return h === target;
+    }
+    // One-time migration: purge any legacy plain-text PIN from storage.
+    function migrateLegacyPin() {
+      if (localStorage.getItem('leafnote_pin') !== null) {
+        localStorage.removeItem('leafnote_pin');
+      }
     }
 
     // Load initial local backup
@@ -1221,6 +1294,13 @@
     }
 
     function pressPin(digit) {
+      const left = lockRemaining();
+      if (left > 0) {
+        $('pinError').textContent = `Too many attempts. Locked for ${left}s.`;
+        startLockoutCountdown();
+        return;
+      }
+      if (pinVerifying) return;
       if (currentPinInput.length >= 4) return;
       currentPinInput += digit;
       updatePinUI();
@@ -1256,21 +1336,84 @@
       });
     }
 
-    function verifyPin() {
-      const validPin = getSavedPin();
-      if (currentPinInput === validPin) {
-        sessionStorage.setItem('leafnote_unlocked', 'true');
-        $('lockScreen').classList.remove('show');
-        clearPin();
-        toast('Welcome back to Leafnote!');
+    // -------- Brute-force cooldown --------
+    function getLockout() {
+      try {
+        const st = JSON.parse(localStorage.getItem('leafnote_lockout') || 'null');
+        if (st && typeof st.fails === 'number' && typeof st.until === 'number') return st;
+      } catch (e) {}
+      return { fails: 0, until: 0, rounds: 0 };
+    }
+    function setLockout(st) { localStorage.setItem('leafnote_lockout', JSON.stringify(st)); }
+    function clearLockout() {
+      localStorage.removeItem('leafnote_lockout');
+      if (lockoutTimer) { clearInterval(lockoutTimer); lockoutTimer = null; }
+    }
+    function lockRemaining() { return Math.max(0, Math.ceil((getLockout().until - Date.now()) / 1000)); }
+    function startLockoutCountdown() {
+      if (lockoutTimer) clearInterval(lockoutTimer);
+      lockoutTimer = setInterval(() => {
+        const left = lockRemaining();
+        if (left > 0) {
+          $('pinError').textContent = `Too many attempts. Locked for ${left}s.`;
+        } else {
+          clearInterval(lockoutTimer);
+          lockoutTimer = null;
+          $('pinError').textContent = 'You may try again.';
+        }
+      }, 1000);
+    }
+    function registerFailedAttempt() {
+      const st = getLockout();
+      st.fails += 1;
+      if (st.fails >= 5) {
+        st.rounds = (st.rounds || 0) + 1;
+        const secs = Math.min(30 * Math.pow(2, st.rounds - 1), 300);
+        st.until = Date.now() + secs * 1000;
+        st.fails = 0;
+        $('pinError').textContent = `Too many attempts. Locked for ${Math.ceil(secs)}s.`;
+        startLockoutCountdown();
       } else {
-        const dotsContainer = $('pinDots');
-        dotsContainer.classList.add('shake');
-        $('pinError').textContent = 'Incorrect PIN. Try again.';
-        setTimeout(() => {
-          dotsContainer.classList.remove('shake');
+        const left = 5 - st.fails;
+        $('pinError').textContent = `Incorrect PIN. ${left} attempt${left === 1 ? '' : 's'} left.`;
+      }
+      setLockout(st);
+      const dotsContainer = $('pinDots');
+      dotsContainer.classList.add('shake');
+      setTimeout(() => {
+        dotsContainer.classList.remove('shake');
+        clearPin();
+      }, 500);
+    }
+
+    async function verifyPin() {
+      if (pinVerifying) return;
+      const entered = currentPinInput;
+      if (entered.length !== 4) return;
+      const left = lockRemaining();
+      if (left > 0) {
+        $('pinError').textContent = `Too many attempts. Locked for ${left}s.`;
+        startLockoutCountdown();
+        clearPin();
+        return;
+      }
+      pinVerifying = true;
+      $('pinError').textContent = 'Verifying\u2026';
+      try {
+        const ok = await verifySecretRecord('leafnote_pin_hash', entered, DEFAULT_PIN_SALT, DEFAULT_PIN_HASH);
+        if (ok) {
+          clearLockout();
+          sessionStorage.setItem('leafnote_unlocked', 'true');
+          $('lockScreen').classList.remove('show');
           clearPin();
-        }, 500);
+          toast('Welcome back to Leafnote!');
+        } else {
+          registerFailedAttempt();
+        }
+      } catch (err) {
+        $('pinError').textContent = 'Security engine unavailable in this browser.';
+      } finally {
+        pinVerifying = false;
       }
     }
 
@@ -1282,53 +1425,199 @@
     }
 
     function openPinSettings() {
+      const recActive = hasRecoveryRecord();
       $('modalbox').innerHTML = `
         <h2>⚙ PIN Security Settings</h2>
-        <p>Update your 4-digit passcode for accessing your reading journal.</p>
+        <p>Your PIN is stored only as a salted PBKDF2-SHA256 hash — never in plain text. A forgotten PIN can be restored with your personal recovery key.</p>
         <div style="display:flex; flex-direction:column; gap:12px; margin: 18px 0;">
           <div>
             <label>Current PIN</label>
-            <input type="password" id="curPin" maxlength="6" placeholder="Enter current PIN (default: 1234)">
+            <input type="password" id="curPin" maxlength="6" placeholder="Enter current PIN">
           </div>
           <div>
             <label>New 4-Digit PIN</label>
-            <input type="password" id="newPin" maxlength="6" placeholder="e.g. 5678">
+            <input type="password" id="newPin" maxlength="4" placeholder="4 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
           </div>
           <div>
             <label>Confirm New PIN</label>
-            <input type="password" id="confirmPin" maxlength="6" placeholder="Re-enter new PIN">
+            <input type="password" id="confirmPin" maxlength="4" placeholder="Re-enter new PIN" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
           </div>
         </div>
-        <div style="display:flex; justify-content:flex-end; gap:8px;">
-          <button class="btn-outline" onclick="closeModal()">Cancel</button>
-          <button class="btn-dark" onclick="saveNewPin()">Save New PIN</button>
+        <p><b>🔑 Recovery key:</b> ${recActive ? 'active on this device' : 'not yet generated'} — mint a new one only if the old key is compromised; the old key is erased.</p>
+        <div class="modal-actions" style="justify-content: space-between;">
+          <button class="btn-outline" onclick="newRecoveryKey()">🔑 New recovery key</button>
+          <span style="display:flex; gap:8px;">
+            <button class="btn-outline" onclick="closeModal()">Cancel</button>
+            <button class="btn-dark" onclick="saveNewPin()">Save New PIN</button>
+          </span>
         </div>
       `;
       $('modal').classList.add('show');
     }
 
-    function saveNewPin() {
+    async function saveNewPin() {
       const cur = $('curPin').value.trim();
       const next = $('newPin').value.trim();
       const confirm = $('confirmPin').value.trim();
-      const currentSaved = getSavedPin();
-
-      if (cur !== currentSaved) {
-        toast('Current PIN is incorrect.');
+      try {
+        const curOk = await verifySecretRecord('leafnote_pin_hash', cur, DEFAULT_PIN_SALT, DEFAULT_PIN_HASH);
+        if (!curOk) {
+          toast('Current PIN is incorrect.');
+          return;
+        }
+      } catch (err) {
+        toast('Security engine unavailable in this browser.');
         return;
       }
-      if (!next || next.length < 4) {
-        toast('New PIN must be at least 4 digits.');
+      if (!/^\d{4}$/.test(next)) {
+        toast('New PIN must be exactly 4 digits.');
         return;
       }
       if (next !== confirm) {
         toast('New PIN and confirmation do not match.');
         return;
       }
-
-      localStorage.setItem('leafnote_pin', next);
+      await writeSecretRecord('leafnote_pin_hash', next);
       closeModal();
       toast('PIN successfully updated!');
+    }
+
+    // ============================================================
+    // Recovery Key — the only way back in without the PIN.
+    // Generated locally, shown exactly once, stored only as a hash.
+    // ============================================================
+    function normalizeRecoveryKey(v) {
+      let v2 = String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (!v2.startsWith('LN')) v2 = 'LN' + v2;
+      return v2;
+    }
+    function generateRecoveryKey() {
+      const raw = randomHex(8).toUpperCase();
+      return 'LN-' + (raw.match(/.{1,4}/g) || []).join('-');
+    }
+    function hasRecoveryRecord() {
+      return !!readSecretRecord('leafnote_recovery');
+    }
+    async function ensureRecoveryKey() {
+      migrateLegacyPin();
+      if (!hasRecoveryRecord()) {
+        const key = generateRecoveryKey();
+        await writeSecretRecord('leafnote_recovery', normalizeRecoveryKey(key));
+        showRecoveryKeyOnce(key, false);
+      }
+    }
+    function showRecoveryKeyOnce(key, isRegen) {
+      const note = isRegen
+        ? 'Your previous recovery key has been erased. This new key is your restore credential.'
+        : 'Leafnote has generated your personal recovery key. It is the only way to restore access if you ever forget your PIN.';
+      $('modalbox').innerHTML = `
+        <h2>🔑 Your Recovery Key</h2>
+        <p>${note} <b>It is shown only this once</b> — only a cryptographic hash is kept on this device.</p>
+        <div class="recovery-key-box" id="recoveryKeyText">${esc(key)}</div>
+        <p>Save it now in your password manager or write it on paper.</p>
+        <label>Type your key to confirm you have saved it</label>
+        <input type="text" id="recoveryConfirm" placeholder="LN-XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
+        <div class="modal-actions">
+          <button class="btn-outline" onclick="copyRecoveryKey()">Copy key</button>
+          <button class="btn-dark" onclick="confirmRecoverySaved()">I have saved it</button>
+        </div>
+      `;
+      $('modal').classList.add('show');
+    }
+    function copyRecoveryKey() {
+      const text = $('recoveryKeyText').textContent.trim();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => toast('Recovery key copied.'), () => {});
+      } else {
+        toast('Select the key and copy it manually.');
+      }
+    }
+    function confirmRecoverySaved() {
+      const typed = normalizeRecoveryKey($('recoveryConfirm').value);
+      const shown = normalizeRecoveryKey($('recoveryKeyText').textContent);
+      if (typed !== shown) {
+        toast('The typed key does not match. Please enter it exactly.');
+        return;
+      }
+      closeModal();
+      toast('Recovery key secured. Keep it safe!');
+    }
+    function openRecovery() {
+      $('modalbox').innerHTML = `
+        <h2>🔑 Recover Access</h2>
+        <p>Enter the personal recovery key you saved when you first set up Leafnote. It is the only credential that can reset a forgotten PIN.</p>
+        <label>Recovery key</label>
+        <input type="text" id="recoveryInput" placeholder="LN-XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
+        <div class="modal-actions">
+          <button class="btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn-dark" onclick="submitRecoveryKey()">Restore access</button>
+        </div>
+      `;
+      $('modal').classList.add('show');
+    }
+    async function submitRecoveryKey() {
+      const typed = normalizeRecoveryKey($('recoveryInput').value);
+      if (!typed) {
+        toast('Enter your recovery key first.');
+        return;
+      }
+      try {
+        const ok = await verifySecretRecord('leafnote_recovery', typed, null, null);
+        if (!ok) {
+          toast('That recovery key does not match.');
+          return;
+        }
+      } catch (err) {
+        toast('Security engine unavailable in this browser.');
+        return;
+      }
+      clearLockout();
+      $('modalbox').innerHTML = `
+        <h2>✅ Identity verified</h2>
+        <p>Set a new 4-digit PIN for your journal. It is stored only as a salted PBKDF2 hash.</p>
+        <label>New 4-Digit PIN</label>
+        <input type="password" id="newPin" maxlength="4" placeholder="4 digits" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        <label>Confirm New PIN</label>
+        <input type="password" id="confirmPin" maxlength="4" placeholder="Re-enter new PIN" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        <div class="modal-actions">
+          <button class="btn-dark" onclick="saveRecoveredPin()">Save &amp; unlock</button>
+        </div>
+      `;
+    }
+    async function saveRecoveredPin() {
+      const next = $('newPin').value.trim();
+      const confirm = $('confirmPin').value.trim();
+      if (!/^\d{4}$/.test(next)) {
+        toast('PIN must be exactly 4 digits.');
+        return;
+      }
+      if (next !== confirm) {
+        toast('New PIN and confirmation do not match.');
+        return;
+      }
+      await writeSecretRecord('leafnote_pin_hash', next);
+      clearLockout();
+      sessionStorage.setItem('leafnote_unlocked', 'true');
+      $('lockScreen').classList.remove('show');
+      closeModal();
+      clearPin();
+      toast('New PIN saved. Welcome back to Leafnote!');
+    }
+    async function newRecoveryKey() {
+      const cur = $('curPin').value.trim();
+      try {
+        const curOk = await verifySecretRecord('leafnote_pin_hash', cur, DEFAULT_PIN_SALT, DEFAULT_PIN_HASH);
+        if (!curOk) {
+          toast('Enter your current PIN first to mint a new key.');
+          return;
+        }
+      } catch (err) {
+        toast('Security engine unavailable in this browser.');
+        return;
+      }
+      const key = generateRecoveryKey();
+      await writeSecretRecord('leafnote_recovery', normalizeRecoveryKey(key));
+      showRecoveryKeyOnce(key, true);
     }
 
     window.addEventListener('keydown', (e) => {
@@ -2192,7 +2481,7 @@
         <p><b>✍️ One-tap notes:</b> Type the book title and your thoughts, then tap <b>Save note</b>. Author, rating and characters are optional — tap <b>More details</b> whenever you want them.</p>
         <p><b>✉️ Send as a letter:</b> Tap <b>Letter</b> on any note to turn it into an elegant one-page PDF letter — then share it to WhatsApp, email or any app, or simply download it.</p>
         <p><b>⚡ Cloud sync:</b> Every note, wishlist item and edit is saved and synchronized across your devices in real time.</p>
-        <p><b>🔒 PIN lock:</b> Protected by default with PIN <b>1234</b>. Change it anytime under <b>PIN</b> in the top bar.</p>
+        <p><b>🔒 PIN lock:</b> Your journal is sealed by a private 4-digit PIN, stored only as a salted PBKDF2-SHA256 hash — never in plain text. Change it under <b>PIN</b> in the top bar. Forgotten? Use <b>🔑 Forgot PIN?</b> on the lock screen with the personal recovery key you saved on first run. Five wrong attempts trigger an escalating cooldown.</p>
         <div class="modal-actions">
           <button class="btn-dark" onclick="closeModal()">Got it</button>
         </div>
@@ -2630,6 +2919,12 @@
       lockApp,
       openPinSettings,
       saveNewPin,
+      openRecovery,
+      submitRecoveryKey,
+      saveRecoveredPin,
+      confirmRecoverySaved,
+      copyRecoveryKey,
+      newRecoveryKey,
       switchTab,
       toggleDetailsCollapse,
       updateDetailsBadge,
@@ -2665,7 +2960,11 @@
 
     // Startup Initialization
     function init() {
-      checkInitialAuth();
+      ensureRecoveryKey()
+        .catch(err => console.error('Recovery key init failed:', err))
+        .finally(() => {
+          checkInitialAuth();
+        });
       try {
         $('heroDate').textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
       } catch (e) {}
