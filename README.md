@@ -31,7 +31,9 @@ A real example of a generated letter is included in this repository: open **`sam
 - JSON / CSV backups, printable sheets, and file import — under **Backup**.
 
 ### 🔒 Private by design
-- PIN passcode gate (default **1234**, change it under **PIN** in the top bar).
+- **PIN passcode gate** — a private 4-digit PIN seals the notebook. It is deliberately *not* written in this README or anywhere in the source: the shipped code contains only a salted **PBKDF2-SHA256** hash (250,000 iterations), and PINs you choose yourself are hashed the same way via the browser's Web Crypto API before storage.
+- **Personal recovery key** — on first run, Leafnote mints a recovery key in `LN-XXXX-XXXX-XXXX-XXXX` form, shows it **exactly once**, and keeps only its salted hash. Forget the PIN? Tap **🔑 Forgot PIN?** on the lock screen and enter that key to set a new one. Without the key — which only you hold — access cannot be restored, and it can be re-minted (old key erased) from **PIN** settings.
+- **Brute-force cooldown** — five wrong attempts lock the keypad for 30 seconds, doubling with every repeated lockout, up to five minutes.
 - Live cloud-sync badge in the header; your notes survive offline via local backup.
 
 ---
@@ -39,7 +41,7 @@ A real example of a generated letter is included in this repository: open **`sam
 ## 🚀 Quick start
 
 1. Open `index.html` in any modern browser (no build step needed).
-2. Enter the default PIN **1234**.
+2. Unlock with your private PIN — kept out of this documentation on purpose. On the very first run, save the **recovery key** the app shows you; it is your only way back in if the PIN is ever forgotten.
 3. Write a note, tap **Save note**.
 4. Tap **✉️ Letter** on the note, enter a recipient, tap **Make PDF & send** — done.
 
